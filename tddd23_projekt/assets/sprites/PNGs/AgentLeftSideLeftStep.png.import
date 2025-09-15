@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c6ke8yagykpcd"
-path="res://.godot/imported/AgentLeftSideLeftStep.png-20b52b6c3ec3b3b26e70d40301809132.ctex"
+path="res://.godot/imported/AgentLeftSideLeftStep.png-66e862ab9426221ebc1c3fb236ddce38.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/PNGs/AgentLeftSideLeftStep.png"
-dest_files=["res://.godot/imported/AgentLeftSideLeftStep.png-20b52b6c3ec3b3b26e70d40301809132.ctex"]
+source_file="res://assets/sprites/PNGs/AgentLeftSideLeftStep.png"
+dest_files=["res://.godot/imported/AgentLeftSideLeftStep.png-66e862ab9426221ebc1c3fb236ddce38.ctex"]
 
 [params]
 

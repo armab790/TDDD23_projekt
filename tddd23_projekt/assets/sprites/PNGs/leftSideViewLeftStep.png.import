@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b10giyhtnx4u5"
-path="res://.godot/imported/leftSideViewLeftStep.png-ff2837d84996adbefd0e6edfb5a27cc5.ctex"
+path="res://.godot/imported/leftSideViewLeftStep.png-fc33b35468c8a5b3ba0fcc5f543fb869.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/PNGs/leftSideViewLeftStep.png"
-dest_files=["res://.godot/imported/leftSideViewLeftStep.png-ff2837d84996adbefd0e6edfb5a27cc5.ctex"]
+source_file="res://assets/sprites/PNGs/leftSideViewLeftStep.png"
+dest_files=["res://.godot/imported/leftSideViewLeftStep.png-fc33b35468c8a5b3ba0fcc5f543fb869.ctex"]
 
 [params]
 

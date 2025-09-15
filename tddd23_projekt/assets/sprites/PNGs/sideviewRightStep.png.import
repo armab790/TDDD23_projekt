@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://rrbkawbbxemj"
-path="res://.godot/imported/sideviewRightStep.png-518172bfe2db1264b43fdc113c9ea3b7.ctex"
+path="res://.godot/imported/sideviewRightStep.png-58bfa5c489920644955b21d4adf54d21.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/PNGs/sideviewRightStep.png"
-dest_files=["res://.godot/imported/sideviewRightStep.png-518172bfe2db1264b43fdc113c9ea3b7.ctex"]
+source_file="res://assets/sprites/PNGs/sideviewRightStep.png"
+dest_files=["res://.godot/imported/sideviewRightStep.png-58bfa5c489920644955b21d4adf54d21.ctex"]
 
 [params]
 

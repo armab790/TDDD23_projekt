@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bcsa2twn2o7qg"
-path="res://.godot/imported/AgentFrontLeftLeg.png-e3b827559781e70a0cc305472c071249.ctex"
+path="res://.godot/imported/AgentFrontLeftLeg.png-833df4e065f33fe1f0c9fa9fa1e871dd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/PNGs/AgentFrontLeftLeg.png"
-dest_files=["res://.godot/imported/AgentFrontLeftLeg.png-e3b827559781e70a0cc305472c071249.ctex"]
+source_file="res://assets/sprites/PNGs/AgentFrontLeftLeg.png"
+dest_files=["res://.godot/imported/AgentFrontLeftLeg.png-833df4e065f33fe1f0c9fa9fa1e871dd.ctex"]
 
 [params]
 
