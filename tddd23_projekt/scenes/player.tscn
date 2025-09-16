@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cv5i22bg8yb6a"]
+[gd_scene load_steps=17 format=3 uid="uid://cv5i22bg8yb6a"]
 
 [ext_resource type="Texture2D" uid="uid://u7x2xa3re3vj" path="res://assets/sprites/PNGs/frontviewLeftStep.png" id="1_3v2ag"]
 [ext_resource type="Texture2D" uid="uid://c6d7qlbik313y" path="res://assets/sprites/PNGs/frontview.png" id="2_jej6c"]
@@ -104,9 +104,32 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[sub_resource type="GDScript" id="GDScript_jej6c"]
+script/source = "extends AnimatedSprite2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3v2ag"]
+radius = 5.0
+height = 14.0
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_jej6c")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_l71n6")
-animation = &"walking_down"
-frame_progress = 0.324311
+animation = &"idle_down"
+script = SubResource("GDScript_jej6c")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 9)
+shape = SubResource("CapsuleShape2D_3v2ag")
