@@ -1,6 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://d28ufl72uovtn"]
-
-[ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_uwrxv"]
+[gd_scene format=3 uid="uid://d28ufl72uovtn"]
 
 [node name="Game" type="Node2D"]
 <<<<<<< HEAD
