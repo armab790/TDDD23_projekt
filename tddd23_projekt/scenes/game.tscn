@@ -21,3 +21,6 @@ texture = ExtResource("2_yqjtg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall"]
 shape = SubResource("CapsuleShape2D_yqjtg")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.182423, 0.177929, 0.187587, 1)
