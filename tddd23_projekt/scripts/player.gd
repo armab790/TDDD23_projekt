@@ -15,6 +15,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_set_face(Vector2.DOWN)
 	elif event.is_action_pressed("ui_up"):
 		_set_face(Vector2.UP)
+	elif event.is_action_pressed("throw"):
+		_try_throw()
 
 func _physics_process(_delta: float) -> void:
 	# Movement input (built-in helper for 2D axes)
@@ -54,3 +56,38 @@ func _vec_to_cardinal(v: Vector2) -> String:
 		return "left"
 	else:
 		return "right"
+		
+const ROCK_SCENE := preload("res://scenes/Rock.tscn")
+@export var throw_cooldown := 0.35
+var _can_throw := true
+
+func _try_throw() -> void:
+	if not _can_throw:
+		return
+	_can_throw = false
+	_throw_rock()
+	await get_tree().create_timer(throw_cooldown).timeout
+	_can_throw = true
+
+func _throw_rock() -> void:
+	var rock := ROCK_SCENE.instantiate()
+	# spawn slightly ahead of feet so it doesn't immediately collide with player
+	var spawn_offset := last_dir * 10.0
+	rock.global_position = global_position + spawn_offset
+
+	# make sure the rock doesn't collide with the player that threw it
+	if rock is RigidBody2D:
+		rock.add_collision_exception_with(self)
+
+	# send it in the last faced direction (cardinal)
+	rock.throw(last_dir)
+
+	# listen for the noise for future AI (optional)
+	rock.noise_emitted.connect(_on_rock_noise)
+
+	# add to same parent as player (so it shares world/layers)
+	get_parent().add_child(rock)
+
+func _on_rock_noise(pos: Vector2) -> void:
+	# Placeholder: later you’ll broadcast this to enemies’ AI
+	print("Rock noise at: ", pos)

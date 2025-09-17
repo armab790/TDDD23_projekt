@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://c880onl4xyekt"]
+
+[ext_resource type="Texture2D" uid="uid://b0jccw786ijgy" path="res://assets/sprites/PNGs/small-rock.png" id="1_1di36"]
+[ext_resource type="Script" uid="uid://c4wme75d8mrwu" path="res://scripts/Rock.gd" id="1_mek2u"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_1di36"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mek2u"]
+radius = 3.0
+
+[node name="Rock" type="RigidBody2D"]
+position = Vector2(5, -1)
+physics_material_override = SubResource("PhysicsMaterial_1di36")
+gravity_scale = 0.0
+contact_monitor = true
+max_contacts_reported = 4
+linear_damp = 6.0
+script = ExtResource("1_mek2u")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(2, 4.76837e-07)
+scale = Vector2(0.02, 0.0302734)
+texture = ExtResource("1_1di36")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1)
+shape = SubResource("CircleShape2D_mek2u")
+
+[node name="SFX" type="AudioStreamPlayer2D" parent="."]
+position = Vector2(0, 1)
