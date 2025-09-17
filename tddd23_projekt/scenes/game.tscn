@@ -5,6 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://dkgnt807ynoxx" path="res://assets/sprites/PNGs/wall_TileMap.png" id="3_lnu2h"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yqjtg"]
+radius = 5.0
+height = 18.0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnu2h"]
 texture = ExtResource("3_lnu2h")
@@ -140,28 +142,32 @@ texture = ExtResource("3_lnu2h")
 sources/0 = SubResource("TileSetAtlasSource_lbhrr")
 
 [node name="Game" type="Node2D"]
+y_sort_enabled = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(45, -14)
 zoom = Vector2(4, 4)
 
 [node name="Player" parent="." instance=ExtResource("1_uwrxv")]
-z_index = 5
+z_index = 1
 position = Vector2(45, -16)
 
 [node name="Wall" type="StaticBody2D" parent="."]
 z_index = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="Wall"]
+z_index = 1
 texture = ExtResource("2_yqjtg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall"]
+position = Vector2(0, 7)
 shape = SubResource("CapsuleShape2D_yqjtg")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="Walls" type="TileMapLayer" parent="."]
+z_index = 1
 tile_map_data = PackedByteArray("AAABAPz/AAADAAIAAAACAPz/AAADAAIAAAADAPz/AAADAAIAAAAEAPz/AAADAAIAAAAFAPz/AAADAAIAAAAGAPz/AAADAAIAAAAHAPz/AAADAAIAAAAAAPz/AAADAAIAAAD///z/AAADAAIAAAD+//z/AAADAAIAAAD9//z/AAADAAIAAAD8//z/AAADAAIAAAA=")
 tile_set = SubResource("TileSet_lbhrr")
 
