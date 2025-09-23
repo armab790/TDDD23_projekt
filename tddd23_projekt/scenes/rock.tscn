@@ -9,7 +9,9 @@
 radius = 3.0
 
 [node name="Rock" type="RigidBody2D"]
-position = Vector2(5, -1)
+z_index = 1
+y_sort_enabled = true
+position = Vector2(4, -1)
 physics_material_override = SubResource("PhysicsMaterial_1di36")
 gravity_scale = 0.0
 contact_monitor = true
