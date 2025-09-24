@@ -1,14 +1,128 @@
-[gd_scene load_steps=11 format=4 uid="uid://d28ufl72uovtn"]
+[gd_scene load_steps=23 format=4 uid="uid://d28ufl72uovtn"]
 
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_uwrxv"]
 [ext_resource type="Script" uid="uid://b5fxbald8q8q7" path="res://scenes/NPC.gd" id="2_lbhrr"]
 [ext_resource type="Texture2D" uid="uid://j6cnjoqkxenv" path="res://assets/sprites/PNGs/AgentLeftSideStill.png" id="2_yqjtg"]
 [ext_resource type="Texture2D" uid="uid://dkgnt807ynoxx" path="res://assets/sprites/PNGs/wall_TileMap.png" id="3_lnu2h"]
 [ext_resource type="Script" uid="uid://bq55px0l02ixh" path="res://scenes/fov.gd" id="4_iywne"]
+[ext_resource type="Texture2D" uid="uid://ubohpjqdyt35" path="res://assets/sprites/PNGs/AgentBackStill.png" id="5_ca42v"]
+[ext_resource type="Texture2D" uid="uid://cycvp2xwys1vo" path="res://assets/sprites/PNGs/AgentFrontStill.png" id="6_rysoc"]
+[ext_resource type="Texture2D" uid="uid://dm38v0t2ujm2s" path="res://assets/sprites/PNGs/AgentSideStill.png" id="7_ssvqc"]
+[ext_resource type="Texture2D" uid="uid://dr7gwy6444dpg" path="res://assets/sprites/PNGs/AgentBackLeftLeg.png" id="8_264po"]
+[ext_resource type="Texture2D" uid="uid://c035ytiy3euy7" path="res://assets/sprites/PNGs/AgentBackRightLeg.png" id="9_1kice"]
+[ext_resource type="Texture2D" uid="uid://bcsa2twn2o7qg" path="res://assets/sprites/PNGs/AgentFrontLeftLeg.png" id="10_5newe"]
+[ext_resource type="Texture2D" uid="uid://cm5tjowrpx782" path="res://assets/sprites/PNGs/AgentFrontRightLeg.png" id="11_37s47"]
+[ext_resource type="Texture2D" uid="uid://c6ke8yagykpcd" path="res://assets/sprites/PNGs/AgentLeftSideLeftStep.png" id="12_bt5mj"]
+[ext_resource type="Texture2D" uid="uid://dtiw4y5s3rnf7" path="res://assets/sprites/PNGs/AgentLeftSideRightStep.png" id="13_e1j6l"]
+[ext_resource type="Texture2D" uid="uid://cwekt6clae64n" path="res://assets/sprites/PNGs/AgentSideLeftStep.png" id="14_pl11u"]
+[ext_resource type="Texture2D" uid="uid://d221f7uvqtjps" path="res://assets/sprites/PNGs/AgentSideRightStep.png" id="15_bhx41"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yqjtg"]
 radius = 5.0
 height = 18.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qnb83"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_ca42v")
+}],
+"loop": true,
+"name": &"backStill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_rysoc")
+}],
+"loop": true,
+"name": &"frontStill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_yqjtg")
+}],
+"loop": true,
+"name": &"leftStill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_ssvqc")
+}],
+"loop": true,
+"name": &"rightStill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_264po")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ca42v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_1kice")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ca42v")
+}],
+"loop": true,
+"name": &"walkBack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_5newe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_rysoc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_37s47")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_rysoc")
+}],
+"loop": true,
+"name": &"walkFront",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_bt5mj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_yqjtg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_e1j6l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_yqjtg")
+}],
+"loop": true,
+"name": &"walkLeft",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_pl11u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_ssvqc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_bhx41")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_ssvqc")
+}],
+"loop": true,
+"name": &"walkRight",
+"speed": 5.0
+}]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lbhrr"]
 texture = ExtResource("3_lnu2h")
@@ -193,11 +307,9 @@ zoom = Vector2(4, 4)
 [node name="NPC" type="CharacterBody2D" parent="."]
 z_index = 1
 script = ExtResource("2_lbhrr")
-speed = null
-view_distance = null
-fov_deg = null
 
 [node name="Sprite2D" type="Sprite2D" parent="NPC"]
+visible = false
 z_index = 1
 texture = ExtResource("2_yqjtg")
 
@@ -207,6 +319,10 @@ shape = SubResource("CapsuleShape2D_yqjtg")
 
 [node name="FOV" type="Node2D" parent="NPC"]
 script = ExtResource("4_iywne")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NPC"]
+sprite_frames = SubResource("SpriteFrames_qnb83")
+animation = &"walkBack"
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 visible = false
