@@ -1,9 +1,29 @@
 extends CharacterBody2D
 
+signal noise_emitted(pos: Vector2, radius: float, loudness: float, priority: int)
+
 const SPEED := 100.0
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 
+# NEW: footstep audio + cadence
+@onready var foot: AudioStreamPlayer2D = $Footsteps
+@onready var step_timer: Timer = $StepTimer
+
+@export var walk_step_interval: float = 0.38          # seconds between steps while moving
+@export var footstep_hear_radius_walk: float = 120.0  # how far NPCs can "hear" a step
+@export var footstep_pitch_jitter: float = 0.08       # +- pitch variance for variety
+@export var footstep_priority: int = 1                # AI weight (doors/explosions could be >1)
+
 var last_dir: Vector2 = Vector2.DOWN  # where we’re facing when idle
+var _moving_strength := 0.0           # 0..1 how hard we're moving (for cadence)
+
+@onready var noise_ring: Node2D = $NoiseRing
+
+
+func _ready() -> void:
+	# hook step timer (safe even if already connected)
+	if not step_timer.timeout.is_connected(_on_step_timer):
+		step_timer.timeout.connect(_on_step_timer)
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Face instantly when a key is pressed
@@ -24,7 +44,23 @@ func _physics_process(_delta: float) -> void:
 	velocity = input_vec * SPEED
 	move_and_slide()
 
-	# Animation
+	# --- NEW: footstep cadence control ---
+	_moving_strength = input_vec.length()
+	
+	
+	noise_ring.set_radius(footstep_hear_radius_walk)
+	noise_ring.visible = _moving_strength > 0.01
+		# optional: color tweak
+		# noise_ring.set_t
+	
+	
+	if _moving_strength > 0.01:
+		step_timer.wait_time = walk_step_interval
+		if step_timer.is_stopped(): step_timer.start()
+	else:
+		step_timer.stop()
+
+	# Animation (unchanged)
 	if input_vec != Vector2.ZERO:
 		var axis_dir: Vector2
 		if abs(input_vec.x) > abs(input_vec.y):
@@ -56,7 +92,7 @@ func _vec_to_cardinal(v: Vector2) -> String:
 		return "left"
 	else:
 		return "right"
-		
+
 const ROCK_SCENE := preload("res://scenes/Rock.tscn")
 @export var throw_cooldown := 0.35
 var _can_throw := true
@@ -91,3 +127,15 @@ func _throw_rock() -> void:
 func _on_rock_noise(pos: Vector2) -> void:
 	# Placeholder: later you’ll broadcast this to enemies’ AI
 	print("Rock noise at: ", pos)
+
+# --- NEW: footstep "tick" ---
+func _on_step_timer() -> void:
+	if _moving_strength <= 0.01:
+		return
+	# audible step for the human player (2D attenuation handled by AudioStreamPlayer2D)
+	var jitter = clamp(1.0 + (randf() * 2.0 - 1.0) * footstep_pitch_jitter, 0.75, 1.25)
+	foot.pitch_scale = jitter
+	foot.play()
+	# AI hearing: emit noise signal with radius + loudness (0..1) + priority
+	var loudness := 1.0  # walking baseline; make >1.0 for running if you add a run state
+	emit_signal("noise_emitted", global_position, footstep_hear_radius_walk, loudness, footstep_priority)

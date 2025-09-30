@@ -12,20 +12,34 @@ extends CharacterBody2D
 # Where the NPC faces when idle (cardinal)
 var last_dir: Vector2 = Vector2.DOWN
 
+# --- NEW: hearing + reaction tuning ---
+@export var hear_radius_fallback: float = 120.0  # used if player sends 0
+@export var prob_at_edge: float = 0.15           # chance to react at edge of radius
+@export var prob_at_center: float = 0.85         # chance to react when very close
+@export var turn_only_threshold: float = 0.35    # below this, just turn/lean; above, move toward
+@export var react_cooldown: float = 0.30         # seconds; avoid reacting to every step
+var _hear_cooldown: float = 0.0
+
 func _ready() -> void:
 	randomize()
 	velocity = Vector2.RIGHT.rotated(randf() * TAU) * speed
+	# listen to player footsteps (noise_emitted)
+	if player and player.has_signal("noise_emitted"):
+		player.connect("noise_emitted", Callable(self, "_on_noise_emitted"))
 
 func _physics_process(delta: float) -> void:
-	# --- Move & bounce ---
+	# cooldown tick for hearing reactions
+	_hear_cooldown = max(0.0, _hear_cooldown - delta)
+
+	# --- Move & bounce (unchanged) ---
 	var collision := move_and_collide(velocity * delta)
 	if collision:
 		velocity = velocity.bounce(collision.get_normal())
 
-	# --- Animate based on velocity ---
+	# --- Animate based on velocity (unchanged) ---
 	_update_animation()
 
-	# --- Spot player? ---
+	# --- Spot player? (unchanged) ---
 	if player and _can_see_player(player):
 		Transition.caught_and_restart()
 
@@ -84,3 +98,38 @@ func _dir_to_vector(d: Vector2) -> Vector2:
 	if d == Vector2.ZERO:
 		return Vector2.RIGHT
 	return d.normalized()
+
+# --- NEW: react to footsteps / noises ---
+func _on_noise_emitted(pos: Vector2, radius: float, loudness: float, priority: int) -> void:
+	if _hear_cooldown > 0.0:
+		return
+
+	var r: float
+	if radius > 0.0:
+		r = radius
+	else:
+		r = hear_radius_fallback
+	var d: float = global_position.distance_to(pos)
+	if d > r:
+		return  # out of range
+
+	# Strength 0..1: 1 at the sound source, 0 at radius edge
+	var strength: float = 1.0 - (d / r)
+
+	# Weight from loudness (0..1) and priority (e.g., 1 footsteps, 2 doors)
+	var weight: float = clamp(loudness, 0.0, 1.0) * clamp(float(priority), 0.5, 3.0)
+
+	# Probability increases toward the center and with weight
+	var base_prob: float = lerp(prob_at_edge, prob_at_center, strength)
+	var react_prob: float = clamp(base_prob * (0.6 + 0.4 * weight), 0.0, 1.0)
+
+	if randf() <= react_prob:
+		var dir: Vector2 = (pos - global_position).normalized()
+		if strength < turn_only_threshold:
+			# subtle: lean/turn toward sound without fully committing
+			velocity = velocity.lerp(dir * speed, 0.35)
+		else:
+			# commit: head toward the sound
+			velocity = dir * speed
+
+		_hear_cooldown = react_cooldown
