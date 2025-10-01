@@ -299,8 +299,10 @@ physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_lnu2h")
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1kice"]
+radius = 22.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5newe"]
+size = Vector2(12, 20)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_37s47"]
 animations = [{
@@ -403,16 +405,20 @@ position = Vector2(169, -84)
 script = ExtResource("18_ssvqc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Door"]
+position = Vector2(0, -6)
 shape = SubResource("CircleShape2D_1kice")
 one_way_collision_margin = 13.1
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Door"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Door/StaticBody2D"]
+position = Vector2(0, -15)
 shape = SubResource("RectangleShape2D_5newe")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Door"]
+position = Vector2(0, -12)
 sprite_frames = SubResource("SpriteFrames_37s47")
 animation = &"Closed Door"
 
 [node name="Marker2D" type="Marker2D" parent="Door"]
+position = Vector2(0, -6)
