@@ -1,8 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://bi51sinak2u"]
+[gd_scene load_steps=19 format=3 uid="uid://bi51sinak2u"]
 
 [ext_resource type="Texture2D" uid="uid://ubohpjqdyt35" path="res://assets/sprites/PNGs/AgentBackStill.png" id="1_5t8s8"]
+[ext_resource type="Script" uid="uid://b5fxbald8q8q7" path="res://scripts/NPC.gd" id="1_jiysx"]
 [ext_resource type="Texture2D" uid="uid://cycvp2xwys1vo" path="res://assets/sprites/PNGs/AgentFrontStill.png" id="2_gmbj5"]
 [ext_resource type="Texture2D" uid="uid://j6cnjoqkxenv" path="res://assets/sprites/PNGs/AgentLeftSideStill.png" id="3_jiysx"]
+[ext_resource type="Script" uid="uid://bq55px0l02ixh" path="res://scripts/fov.gd" id="3_rwfh4"]
 [ext_resource type="Texture2D" uid="uid://dm38v0t2ujm2s" path="res://assets/sprites/PNGs/AgentSideStill.png" id="4_rwfh4"]
 [ext_resource type="Texture2D" uid="uid://dr7gwy6444dpg" path="res://assets/sprites/PNGs/AgentBackLeftLeg.png" id="5_4cv6p"]
 [ext_resource type="Texture2D" uid="uid://c035ytiy3euy7" path="res://assets/sprites/PNGs/AgentBackRightLeg.png" id="6_8ryoh"]
@@ -12,8 +14,13 @@
 [ext_resource type="Texture2D" uid="uid://dtiw4y5s3rnf7" path="res://assets/sprites/PNGs/AgentLeftSideRightStep.png" id="10_74kyn"]
 [ext_resource type="Texture2D" uid="uid://cwekt6clae64n" path="res://assets/sprites/PNGs/AgentSideLeftStep.png" id="11_a6gbn"]
 [ext_resource type="Texture2D" uid="uid://d221f7uvqtjps" path="res://assets/sprites/PNGs/AgentSideRightStep.png" id="12_kjnhq"]
+[ext_resource type="BehaviorTree" uid="uid://djj3ohs8y2nqr" path="res://ai/trees/npc.tres" id="15_rwfh4"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_76wvy"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4cv6p"]
+radius = 5.0
+height = 18.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8ryoh"]
 animations = [{
 "frames": [{
 "duration": 1.0,
@@ -116,8 +123,28 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="BlackboardPlan" id="BlackboardPlan_4cv6p"]
+
 [node name="NPC" type="CharacterBody2D"]
+z_index = 1
+script = ExtResource("1_jiysx")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
+z_index = 1
+texture = ExtResource("3_jiysx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 7)
+shape = SubResource("CapsuleShape2D_4cv6p")
+
+[node name="FOV" type="Node2D" parent="."]
+script = ExtResource("3_rwfh4")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_76wvy")
+sprite_frames = SubResource("SpriteFrames_8ryoh")
 animation = &"walkBack"
+
+[node name="BTPlayer" type="BTPlayer" parent="."]
+behavior_tree = ExtResource("15_rwfh4")
+blackboard_plan = SubResource("BlackboardPlan_4cv6p")
