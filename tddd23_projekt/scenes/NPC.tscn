@@ -148,3 +148,5 @@ animation = &"walkBack"
 [node name="BTPlayer" type="BTPlayer" parent="."]
 behavior_tree = ExtResource("15_rwfh4")
 blackboard_plan = SubResource("BlackboardPlan_4cv6p")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]

@@ -1,179 +1,9 @@
-[gd_scene load_steps=30 format=4 uid="uid://d28ufl72uovtn"]
+[gd_scene load_steps=9 format=4 uid="uid://d28ufl72uovtn"]
 
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_uwrxv"]
-[ext_resource type="Script" uid="uid://b5fxbald8q8q7" path="res://scripts/NPC.gd" id="2_lbhrr"]
-[ext_resource type="Script" uid="uid://cb0n2ewy4u18y" path="res://scripts/noise_ring.gd" id="2_rysoc"]
-[ext_resource type="Texture2D" uid="uid://j6cnjoqkxenv" path="res://assets/sprites/PNGs/AgentLeftSideStill.png" id="2_yqjtg"]
+[ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="3_lbhrr"]
 [ext_resource type="Texture2D" uid="uid://dkgnt807ynoxx" path="res://assets/sprites/PNGs/wall_TileMap.png" id="3_lnu2h"]
-[ext_resource type="Script" uid="uid://bq55px0l02ixh" path="res://scripts/fov.gd" id="4_iywne"]
-[ext_resource type="Texture2D" uid="uid://ubohpjqdyt35" path="res://assets/sprites/PNGs/AgentBackStill.png" id="5_ca42v"]
-[ext_resource type="Texture2D" uid="uid://cycvp2xwys1vo" path="res://assets/sprites/PNGs/AgentFrontStill.png" id="6_rysoc"]
-[ext_resource type="Texture2D" uid="uid://dm38v0t2ujm2s" path="res://assets/sprites/PNGs/AgentSideStill.png" id="7_ssvqc"]
-[ext_resource type="Texture2D" uid="uid://dr7gwy6444dpg" path="res://assets/sprites/PNGs/AgentBackLeftLeg.png" id="8_264po"]
-[ext_resource type="Texture2D" uid="uid://c035ytiy3euy7" path="res://assets/sprites/PNGs/AgentBackRightLeg.png" id="9_1kice"]
-[ext_resource type="Texture2D" uid="uid://bcsa2twn2o7qg" path="res://assets/sprites/PNGs/AgentFrontLeftLeg.png" id="10_5newe"]
-[ext_resource type="Texture2D" uid="uid://cm5tjowrpx782" path="res://assets/sprites/PNGs/AgentFrontRightLeg.png" id="11_37s47"]
-[ext_resource type="Texture2D" uid="uid://c6ke8yagykpcd" path="res://assets/sprites/PNGs/AgentLeftSideLeftStep.png" id="12_bt5mj"]
-[ext_resource type="Texture2D" uid="uid://dtiw4y5s3rnf7" path="res://assets/sprites/PNGs/AgentLeftSideRightStep.png" id="13_e1j6l"]
-[ext_resource type="Texture2D" uid="uid://cwekt6clae64n" path="res://assets/sprites/PNGs/AgentSideLeftStep.png" id="14_pl11u"]
-[ext_resource type="Texture2D" uid="uid://d221f7uvqtjps" path="res://assets/sprites/PNGs/AgentSideRightStep.png" id="15_bhx41"]
-[ext_resource type="Script" uid="uid://dk41jdl5kg7i8" path="res://scripts/door.gd" id="18_ssvqc"]
-[ext_resource type="Texture2D" uid="uid://xctsgix53yds" path="res://assets/sprites/PNGs/ClosedDoor.png" id="19_1kice"]
-[ext_resource type="Texture2D" uid="uid://dqydsqhvv4flo" path="res://assets/sprites/PNGs/OpenDoor.png" id="20_5newe"]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yqjtg"]
-radius = 5.0
-height = 18.0
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_qnb83"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("5_ca42v")
-}],
-"loop": true,
-"name": &"backStill",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("6_rysoc")
-}],
-"loop": true,
-"name": &"frontStill",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_yqjtg")
-}],
-"loop": true,
-"name": &"leftStill",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("7_ssvqc")
-}],
-"loop": true,
-"name": &"rightStill",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("8_264po")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_ca42v")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_1kice")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_ca42v")
-}],
-"loop": true,
-"name": &"walkBack",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("10_5newe")
-}, {
-"duration": 1.0,
-"texture": ExtResource("6_rysoc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("11_37s47")
-}, {
-"duration": 1.0,
-"texture": ExtResource("6_rysoc")
-}],
-"loop": true,
-"name": &"walkFront",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("12_bt5mj")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_yqjtg")
-}, {
-"duration": 1.0,
-"texture": ExtResource("13_e1j6l")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_yqjtg")
-}],
-"loop": true,
-"name": &"walkLeft",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("14_pl11u")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_ssvqc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("15_bhx41")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_ssvqc")
-}],
-"loop": true,
-"name": &"walkRight",
-"speed": 5.0
-}]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_1kice"]
-radius = 22.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5newe"]
-size = Vector2(12, 20)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_37s47"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("19_1kice")
-}],
-"loop": true,
-"name": &"Closed Door",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("20_5newe")
-}],
-"loop": true,
-"name": &"Open Door",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("20_5newe")
-}, {
-"duration": 1.0,
-"texture": ExtResource("19_1kice")
-}],
-"loop": true,
-"name": &"door closes",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("19_1kice")
-}, {
-"duration": 1.0,
-"texture": ExtResource("20_5newe")
-}],
-"loop": true,
-"name": &"door opens",
-"speed": 5.0
-}]
+[ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="18_ssvqc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lbhrr"]
 texture = ExtResource("3_lnu2h")
@@ -348,70 +178,6 @@ sources/0 = SubResource("TileSetAtlasSource_lnu2h")
 [node name="Game" type="Node2D"]
 y_sort_enabled = true
 
-[node name="Player" parent="." instance=ExtResource("1_uwrxv")]
-z_index = 2
-position = Vector2(145, -17)
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-position = Vector2(0, 3)
-zoom = Vector2(4, 4)
-
-[node name="Footsteps" type="AudioStreamPlayer2D" parent="Player"]
-
-[node name="StepTimer" type="Timer" parent="Player"]
-
-[node name="NoiseRing" type="Node2D" parent="Player"]
-z_index = 4
-script = ExtResource("2_rysoc")
-
-[node name="Ring" type="Sprite2D" parent="Player/NoiseRing"]
-z_index = 4
-
-[node name="NPC" type="CharacterBody2D" parent="."]
-z_index = 1
-script = ExtResource("2_lbhrr")
-
-[node name="Sprite2D" type="Sprite2D" parent="NPC"]
-visible = false
-z_index = 1
-texture = ExtResource("2_yqjtg")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC"]
-position = Vector2(0, 7)
-shape = SubResource("CapsuleShape2D_yqjtg")
-
-[node name="FOV" type="Node2D" parent="NPC"]
-script = ExtResource("4_iywne")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NPC"]
-sprite_frames = SubResource("SpriteFrames_qnb83")
-animation = &"walkBack"
-
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="NPC"]
-
-[node name="Door" type="Area2D" parent="."]
-position = Vector2(169, -84)
-script = ExtResource("18_ssvqc")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Door"]
-position = Vector2(0, -6)
-shape = SubResource("CircleShape2D_1kice")
-one_way_collision_margin = 13.1
-
-[node name="StaticBody2D" type="StaticBody2D" parent="Door"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Door/StaticBody2D"]
-position = Vector2(0, -15)
-shape = SubResource("RectangleShape2D_5newe")
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Door"]
-position = Vector2(0, -12)
-sprite_frames = SubResource("SpriteFrames_37s47")
-animation = &"Closed Door"
-
-[node name="Marker2D" type="Marker2D" parent="Door"]
-position = Vector2(0, -6)
-
 [node name="Level1" type="Node2D" parent="."]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="Level1"]
@@ -429,3 +195,13 @@ tile_map_data = PackedByteArray("AAD2//n/AAADAAIAAAD3//n/AAADAAIAAAD4//n/AAADAAI
 tile_set = SubResource("TileSet_lbhrr")
 
 [node name="Level2" type="Node2D" parent="."]
+
+[node name="Door" parent="." instance=ExtResource("18_ssvqc")]
+z_index = 1
+position = Vector2(89, -84)
+
+[node name="NPC" parent="." instance=ExtResource("3_lbhrr")]
+position = Vector2(-27, -6)
+
+[node name="Player" parent="." instance=ExtResource("1_uwrxv")]
+position = Vector2(106, -16)
