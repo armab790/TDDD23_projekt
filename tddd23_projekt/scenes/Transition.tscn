@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://w4ga7b08q310" path="res://scripts/Transition.gd" id="1_fyjtc"]
 
-
 [node name="Transition" type="CanvasLayer"]
 script = ExtResource("1_fyjtc")
 
