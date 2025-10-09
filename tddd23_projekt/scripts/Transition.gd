@@ -3,6 +3,22 @@ extends CanvasLayer
 var shade: ColorRect
 var busy: bool = false
 
+# Transition.gd (autoload)
+func change_scene_with_spawn(path: String, fade: float = 0.4) -> void:
+	await fade_to_black(fade)
+	get_tree().change_scene_to_file(path)
+	# we're an autoload, so we survive the scene change
+	await get_tree().process_frame
+
+	# place player at spawn point in the new scene
+	var player := get_tree().get_first_node_in_group("player")
+	var spawn := get_tree().get_first_node_in_group("spawn_point")
+	if player and spawn:
+		(player as Node2D).global_position = (spawn as Node2D).global_position
+
+	await fade_from_black(fade)
+
+
 func _ready() -> void:
 	# Create or grab Shade
 	shade = get_node_or_null("Shade") as ColorRect

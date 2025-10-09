@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=3 uid="uid://byyoyic6uyubu"]
+
+[ext_resource type="Texture2D" uid="uid://djje420iyae1p" path="res://assets/sprites/PNGs/LeverOff.png" id="1_0vwrv"]
+[ext_resource type="Script" uid="uid://n458bh6s4rg8" path="res://scenes/lever.gd" id="1_cu1kr"]
+[ext_resource type="Texture2D" uid="uid://dqcvmn36a503u" path="res://assets/sprites/PNGs/LeverOn.png" id="2_cu1kr"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cu1kr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_0vwrv")
+}],
+"loop": true,
+"name": &"Off",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_cu1kr")
+}],
+"loop": true,
+"name": &"On",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_0vwrv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_cu1kr")
+}],
+"loop": true,
+"name": &"Turn on",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7u13s"]
+radius = 23.0217
+
+[node name="Lever" type="Area2D"]
+script = ExtResource("1_cu1kr")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_cu1kr")
+animation = &"Turn on"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_7u13s")
+one_way_collision_margin = 74.8
