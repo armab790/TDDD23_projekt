@@ -9,12 +9,13 @@ extends Area2D
 
 @onready var solid: StaticBody2D = $StaticBody2D
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
-@onready var exit_point: Marker2D = $ExitPoint
+@onready var exit_point: Marker2D = get_node_or_null("ExitPoint")
 
 const LEVELS_DIR := "res://scenes/Levels/"
+const MAIN_MENU := "res://scenes/UI/MainMenu.tscn"
 const LEVEL_PREFIX := "Level"
 const LEVEL_EXT := ".tscn"
-@export var max_level: int = 6
+@export var max_level: int = 7
 
 var _player_in_range := false
 var _is_open := false
@@ -136,22 +137,29 @@ func _level_path(n: int) -> String:
 	return "%s%s%d%s" % [LEVELS_DIR, LEVEL_PREFIX, n, LEVEL_EXT]
 
 func _enter_next_level() -> void:
-	# Decide target: explicit next_scene, or auto next
 	var target_path := next_scene
+
+	# Auto-next if empty/auto
 	if target_path == "" or target_path == "auto":
 		var cur := _get_current_level_number()
 		if cur <= 0:
 			push_warning("Door: couldn't detect current level number.")
 			return
+
 		var next_n := cur + 1
+
+		# Past the last level? -> go to menu via Transition
 		if max_level > 0 and next_n > max_level:
-			await Transition.fade_to_black(0.4)
-			await Transition.fade_from_black(0.4)
+			# Hand off to the autoload; do NOT do any more awaits here
+			Transition.return_to_menu(MAIN_MENU)
 			return
+
 		target_path = _level_path(next_n)
 
+	# Safety check
 	if not ResourceLoader.exists(target_path):
 		push_warning("Door: next level not found: " + target_path)
 		return
 
-	await Transition.change_scene_with_spawn(target_path)  # Autoload handles spawn
+	# Normal case: go to next level (autoload handles spawn + waits)
+	Transition.change_scene_with_spawn(target_path, 1.0, "", true)

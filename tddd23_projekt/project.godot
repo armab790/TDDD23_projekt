@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="TDDD23_projekt"
-run/main_scene="uid://by6jbexbg0mpy"
+run/main_scene="uid://c28yy8balksok"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 Transition="*res://scenes/Transition.tscn"
+MusicPlayer="*res://singletons/MusicPlayer.tscn"
 
 [display]
 

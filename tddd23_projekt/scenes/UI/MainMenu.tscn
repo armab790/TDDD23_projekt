@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://c28yy8balksok"]
+
+[ext_resource type="Script" uid="uid://bc1gkcwymepqh" path="res://scenes/UI/MainMenu.gd" id="1_11hie"]
+[ext_resource type="FontFile" uid="uid://d25vkmce7mhlt" path="res://demo/assets/fonts/knewave_regular.ttf" id="2_58fj5"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_3h7gc"]
+line_spacing = 3.3
+font = ExtResource("2_58fj5")
+font_size = 106
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_11hie")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Escape Room"
+label_settings = SubResource("LabelSettings_3h7gc")
+horizontal_alignment = 1
+
+[node name="PlayButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Play"
+autowrap_mode = 2
+clip_text = true
+icon_alignment = 1
+
+[node name="QuitButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Quit"

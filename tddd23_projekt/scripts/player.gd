@@ -21,6 +21,7 @@ var _moving_strength := 0.0           # 0..1 how hard we're moving (for cadence)
 
 
 func _ready() -> void:
+	add_to_group("player")
 	# hook step timer (safe even if already connected)
 	if not step_timer.timeout.is_connected(_on_step_timer):
 		step_timer.timeout.connect(_on_step_timer)

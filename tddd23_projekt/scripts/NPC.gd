@@ -6,7 +6,7 @@ extends CharacterBody2D
 @export var view_distance: float = 100.0
 @export var fov_deg: float = 50.0
 
-@onready var player: Node2D = get_node_or_null("../Player")
+@onready var player: CharacterBody2D = get_node_or_null("../Player")
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 
 # Where the NPC faces when idle (cardinal)
