@@ -164,8 +164,10 @@ zoom = Vector2(4, 4)
 [node name="StepTimer" type="Timer" parent="."]
 
 [node name="NoiseRing" type="Node2D" parent="."]
+visible = false
 z_index = 4
 script = ExtResource("14_f1ej7")
 
 [node name="Ring" type="Sprite2D" parent="NoiseRing"]
+visible = false
 z_index = 4

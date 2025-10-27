@@ -50,7 +50,7 @@ func _physics_process(_delta: float) -> void:
 	
 	
 	noise_ring.set_radius(footstep_hear_radius_walk)
-	noise_ring.visible = _moving_strength > 0.01
+	#noise_ring.visible = _moving_strength > 0.01
 		# optional: color tweak
 		# noise_ring.set_t
 	
