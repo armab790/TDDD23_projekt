@@ -128,6 +128,8 @@ colors = PackedColorArray(0.765159, 0.765159, 0.765159, 1, 1, 1, 1, 1, 0.753247,
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_f1ej7"]
 gradient = SubResource("Gradient_jej6c")
+width = 144
+height = 144
 fill = 1
 fill_from = Vector2(0.5, 0.504587)
 fill_to = Vector2(0.793578, 0.0779817)
@@ -157,7 +159,9 @@ offset = Vector2(0, -0.51)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, 3)
-zoom = Vector2(4, 4)
+zoom = Vector2(6, 6)
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
 
 [node name="Footsteps" type="AudioStreamPlayer2D" parent="."]
 

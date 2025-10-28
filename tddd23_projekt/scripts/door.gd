@@ -3,13 +3,17 @@ extends Area2D
 @export var action_name := "Enter"
 @export var next_scene: String = ""  # leave empty to auto-advance LevelN -> LevelN+1
 @export var open_time: float = 0.25
-@export var required_levers: int = -1   # -1 = auto (use all matching levers in scene)
+@export var required_levers: int = -1
 @export var channel: String = ""        # must match Lever.channel (empty = accept all)
 @export var lever_scope: NodePath       # optional: only count levers under this node
 
 @onready var solid: StaticBody2D = $StaticBody2D
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 @onready var exit_point: Marker2D = get_node_or_null("ExitPoint")
+
+# --- SFX nodes by name ---
+@onready var sfx_locked_player: AudioStreamPlayer2D = $sfx_locked
+@onready var sfx_open_player: AudioStreamPlayer2D = $sfx_open
 
 const LEVELS_DIR := "res://scenes/Levels/"
 const MAIN_MENU := "res://scenes/UI/MainMenu.tscn"
@@ -19,6 +23,7 @@ const LEVEL_EXT := ".tscn"
 
 var _player_in_range := false
 var _is_open := false
+var _open_sfx_played := false
 
 func _ready() -> void:
 	add_to_group("doors")
@@ -26,6 +31,12 @@ func _ready() -> void:
 	body_exited.connect(_on_body_exited)
 	anim.play("Closed Door")
 	_auto_init_required_levers()
+
+	# Fallbacks if streams not set in Inspector
+	if is_instance_valid(sfx_locked_player) and sfx_locked_player.stream == null and ResourceLoader.exists("res://audios/SFX/Locked_Door.mp3"):
+		sfx_locked_player.stream = load("res://audios/SFX/Locked_Door.mp3")
+	if is_instance_valid(sfx_open_player) and sfx_open_player.stream == null and ResourceLoader.exists("res://audios/SFX/Open_Door.mp3"):
+		sfx_open_player.stream = load("res://audios/SFX/Open_Door.mp3")
 
 func _on_body_entered(body: Node) -> void:
 	if body.name == "Player":
@@ -73,8 +84,7 @@ func _matching_levers() -> Array:
 
 func _count_on_levers() -> int:
 	var cnt := 0
-	var arr := _matching_levers()
-	for l in arr:
+	for l in _matching_levers():
 		if l.is_on:
 			cnt += 1
 	return cnt
@@ -83,9 +93,8 @@ func _auto_init_required_levers() -> void:
 	if required_levers >= 0:
 		return
 	var total := _matching_levers().size()
-	required_levers = total  # auto = all matching levers
+	required_levers = total
 	if required_levers == 0:
-		# No levers needed → open immediately (optional)
 		await _open_door()
 
 # ---------- Try open / react to lever toggles ----------
@@ -95,6 +104,9 @@ func _try_open() -> void:
 	if on_count >= required_levers:
 		await _open_door()
 	else:
+		# PLAY LOCKED SFX on failed attempt
+		if is_instance_valid(sfx_locked_player) and sfx_locked_player.stream:
+			sfx_locked_player.play()
 		print("Door locked — levers ", on_count, "/", required_levers)
 
 func on_lever_toggled() -> void:
@@ -110,6 +122,12 @@ func _open_door() -> void:
 	if _is_open:
 		return
 	_is_open = true
+
+	# PLAY OPEN SFX exactly when door unlocks/opens (not on player enter)
+	if not _open_sfx_played and is_instance_valid(sfx_open_player) and sfx_open_player.stream:
+		sfx_open_player.play()
+		_open_sfx_played = true
+
 	anim.play("door opens")
 	await get_tree().create_timer(open_time).timeout
 	anim.play("Open Door")
@@ -148,18 +166,14 @@ func _enter_next_level() -> void:
 
 		var next_n := cur + 1
 
-		# Past the last level? -> go to menu via Transition
 		if max_level > 0 and next_n > max_level:
-			# Hand off to the autoload; do NOT do any more awaits here
 			Transition.return_to_menu(MAIN_MENU)
 			return
 
 		target_path = _level_path(next_n)
 
-	# Safety check
 	if not ResourceLoader.exists(target_path):
 		push_warning("Door: next level not found: " + target_path)
 		return
 
-	# Normal case: go to next level (autoload handles spawn + waits)
 	Transition.change_scene_with_spawn(target_path, 1.0, "", true)

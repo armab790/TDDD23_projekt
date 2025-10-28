@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://b18rd0s7an0cl"]
+[gd_scene load_steps=7 format=3 uid="uid://b18rd0s7an0cl"]
 
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_kul1s"]
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_lsa2l"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_xao72"]
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="4_nrbuy"]
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="5_nrbuy"]
+[ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="6_emect"]
 
 [node name="Level5" type="Node2D"]
 
@@ -30,3 +31,45 @@ position = Vector2(104, -293)
 
 [node name="Lever2" parent="." groups=["levers"] instance=ExtResource("5_nrbuy")]
 position = Vector2(-168, -291)
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.182423, 0.177929, 0.187587, 1)
+
+[node name="LightScene" parent="." instance=ExtResource("6_emect")]
+position = Vector2(-26, -41)
+
+[node name="LightScene2" parent="." instance=ExtResource("6_emect")]
+position = Vector2(24, -117)
+
+[node name="LightScene3" parent="." instance=ExtResource("6_emect")]
+position = Vector2(56, -137)
+
+[node name="LightScene7" parent="." instance=ExtResource("6_emect")]
+position = Vector2(-57, -136)
+
+[node name="LightScene8" parent="." instance=ExtResource("6_emect")]
+position = Vector2(-154, -136)
+
+[node name="LightScene9" parent="." instance=ExtResource("6_emect")]
+position = Vector2(-217, -233)
+
+[node name="LightScene10" parent="." instance=ExtResource("6_emect")]
+position = Vector2(-153, -296)
+
+[node name="LightScene11" parent="." instance=ExtResource("6_emect")]
+position = Vector2(-89, -234)
+
+[node name="LightScene12" parent="." instance=ExtResource("6_emect")]
+position = Vector2(23, -232)
+
+[node name="LightScene13" parent="." instance=ExtResource("6_emect")]
+position = Vector2(87, -297)
+
+[node name="LightScene4" parent="." instance=ExtResource("6_emect")]
+position = Vector2(151, -136)
+
+[node name="LightScene5" parent="." instance=ExtResource("6_emect")]
+position = Vector2(232, -85)
+
+[node name="LightScene6" parent="." instance=ExtResource("6_emect")]
+position = Vector2(215, -184)

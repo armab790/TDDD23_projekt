@@ -181,7 +181,6 @@ y_sort_enabled = true
 [node name="Level1" type="Node2D" parent="."]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="Level1"]
-visible = false
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="Floor" type="TileMapLayer" parent="Level1"]

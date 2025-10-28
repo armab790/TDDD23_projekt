@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://b5tqw58h0ujc6"]
+
+[ext_resource type="Script" uid="uid://dd7ai3k38fvsv" path="res://scenes/flickering_light_2d.gd" id="1_si8r7"]
+
+[sub_resource type="Gradient" id="Gradient_si8r7"]
+offsets = PackedFloat32Array(0, 0.824675)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_58gjy"]
+gradient = SubResource("Gradient_si8r7")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.96, 0.08)
+
+[node name="LightScene" type="Node2D"]
+script = ExtResource("1_si8r7")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(0.931394, 0.652228, 0, 1)
+texture = SubResource("GradientTexture2D_58gjy")

@@ -1,7 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://c28yy8balksok"]
+[gd_scene load_steps=7 format=3 uid="uid://c28yy8balksok"]
 
 [ext_resource type="Script" uid="uid://bc1gkcwymepqh" path="res://scenes/UI/MainMenu.gd" id="1_11hie"]
+[ext_resource type="Texture2D" uid="uid://clx0oy6kt04xg" path="res://assets/images/bg.png" id="2_3h7gc"]
 [ext_resource type="FontFile" uid="uid://d25vkmce7mhlt" path="res://demo/assets/fonts/knewave_regular.ttf" id="2_58fj5"]
+[ext_resource type="Texture2D" uid="uid://cnts63f6lo1h0" path="res://assets/images/play.png" id="4_4vh8y"]
+[ext_resource type="Texture2D" uid="uid://n6ba17f71rm8" path="res://assets/images/quit.png" id="5_b1p1q"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_3h7gc"]
 line_spacing = 3.3
@@ -17,16 +20,25 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_11hie")
 
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_3h7gc")
+stretch_mode = 3
+
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+clip_contents = true
+layout_mode = 0
+offset_left = 1500.0
+offset_top = 300.0
+offset_right = 2532.0
+offset_bottom = 2368.0
+scale = Vector2(0.3, 0.3)
 alignment = 1
 
 [node name="Label" type="Label" parent="VBoxContainer"]
+visible = false
 layout_mode = 2
 text = "Escape Room"
 label_settings = SubResource("LabelSettings_3h7gc")
@@ -34,11 +46,14 @@ horizontal_alignment = 1
 
 [node name="PlayButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "Play"
+icon = ExtResource("4_4vh8y")
+flat = true
+text_overrun_behavior = 1
 autowrap_mode = 2
-clip_text = true
 icon_alignment = 1
 
 [node name="QuitButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "Quit"
+icon = ExtResource("5_b1p1q")
+flat = true
+icon_alignment = 1

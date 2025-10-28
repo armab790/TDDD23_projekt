@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://byyoyic6uyubu"]
+[gd_scene load_steps=7 format=3 uid="uid://byyoyic6uyubu"]
 
 [ext_resource type="Texture2D" uid="uid://djje420iyae1p" path="res://assets/sprites/PNGs/LeverOff.png" id="1_0vwrv"]
 [ext_resource type="Script" uid="uid://n458bh6s4rg8" path="res://scenes/lever.gd" id="1_cu1kr"]
 [ext_resource type="Texture2D" uid="uid://dqcvmn36a503u" path="res://assets/sprites/PNGs/LeverOn.png" id="2_cu1kr"]
+[ext_resource type="AudioStream" uid="uid://dswfay1o51qj6" path="res://audios/SFX/Pull_Lever.mp3" id="4_hd7rw"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_cu1kr"]
 animations = [{
@@ -47,3 +48,7 @@ animation = &"Turn on"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_7u13s")
 one_way_collision_margin = 74.8
+
+[node name="sfx_pull" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_hd7rw")
+volume_db = 2.0

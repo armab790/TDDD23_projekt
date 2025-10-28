@@ -1,12 +1,30 @@
-[gd_scene load_steps=2 format=3 uid="uid://cu8n54g151jby"]
+[gd_scene load_steps=5 format=3 uid="uid://cu8n54g151jby"]
 
 [ext_resource type="Script" uid="uid://w4ga7b08q310" path="res://scripts/Transition.gd" id="1_fyjtc"]
+[ext_resource type="AudioStream" uid="uid://pac1camhtd4u" path="res://audios/SFX/New_Scene.mp3" id="2_1m0lo"]
+[ext_resource type="Texture2D" uid="uid://boaquujf33fgb" path="res://assets/images/nextlevel.png" id="3_x44xi"]
+[ext_resource type="Texture2D" uid="uid://cw1n2vdpkj6iw" path="res://assets/images/finish.png" id="4_swlj3"]
 
 [node name="Transition" type="CanvasLayer"]
 script = ExtResource("1_fyjtc")
+
+[node name="nextlevel" type="TextureRect" parent="."]
+visible = false
+offset_right = 1536.0
+offset_bottom = 1024.0
+texture = ExtResource("3_x44xi")
+
+[node name="finish" type="TextureRect" parent="."]
+visible = false
+offset_right = 1536.0
+offset_bottom = 1024.0
+texture = ExtResource("4_swlj3")
 
 [node name="Shade" type="ColorRect" parent="."]
 z_index = 100
 offset_right = 40.0
 offset_bottom = 40.0
 color = Color(0, 0, 0, 1)
+
+[node name="sfx_new_scene" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_1m0lo")

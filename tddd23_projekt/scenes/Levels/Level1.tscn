@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://kvx8ojut5ewi"]
+[gd_scene load_steps=6 format=3 uid="uid://kvx8ojut5ewi"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_h2u8a"]
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="1_rwobs"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_e5spa"]
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="3_omh7s"]
+[ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_7orvs"]
 
 [node name="Level1" type="Node2D"]
 
@@ -23,3 +24,18 @@ position = Vector2(-106, 59)
 
 [node name="SpawnPoint" type="Marker2D" parent="." groups=["spawn_point"]]
 position = Vector2(-105, 58)
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.182423, 0.177929, 0.187587, 1)
+
+[node name="LightScene" parent="." instance=ExtResource("5_7orvs")]
+position = Vector2(-41, -57)
+
+[node name="LightScene2" parent="." instance=ExtResource("5_7orvs")]
+position = Vector2(-89, 24)
+
+[node name="LightScene3" parent="." instance=ExtResource("5_7orvs")]
+position = Vector2(-89, -137)
+
+[node name="LightScene4" parent="." instance=ExtResource("5_7orvs")]
+position = Vector2(-9, -137)

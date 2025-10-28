@@ -13,7 +13,7 @@ extends CharacterBody2D
 @export var react_cooldown: float = 0.30
 
 # --- Smooth turning reaction ---
-@export var turn_rate_rad: float = 2.0       # radians per second
+@export var turn_rate_rad: float = 1.0       # radians per second
 @export var turn_accel: float = 0.20         # how fast velocity blends toward facing
 @export var hear_grace_time: float = 0.40    # seconds grace after hearing noise
 

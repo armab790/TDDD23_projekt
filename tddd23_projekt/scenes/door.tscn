@@ -1,8 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://d0ltvxvi830p6"]
+[gd_scene load_steps=9 format=3 uid="uid://d0ltvxvi830p6"]
 
 [ext_resource type="Script" uid="uid://dk41jdl5kg7i8" path="res://scripts/door.gd" id="1_83dcw"]
 [ext_resource type="Texture2D" uid="uid://xctsgix53yds" path="res://assets/sprites/PNGs/ClosedDoor.png" id="2_la1wf"]
 [ext_resource type="Texture2D" uid="uid://dqydsqhvv4flo" path="res://assets/sprites/PNGs/OpenDoor.png" id="3_18pbm"]
+[ext_resource type="AudioStream" uid="uid://d0ksjagh7qwkr" path="res://audios/SFX/Locked_Door.mp3" id="4_18pbm"]
+[ext_resource type="AudioStream" uid="uid://bpdsmxigcefcv" path="res://audios/SFX/Open_Door.mp3" id="5_q5w8r"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_q5w8r"]
 radius = 22.0
@@ -73,3 +75,11 @@ animation = &"Closed Door"
 
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(0, -6)
+
+[node name="sfx_locked" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_18pbm")
+volume_db = 1.0
+
+[node name="sfx_open" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_q5w8r")
+volume_db = -8.0

@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cfewjq68h7qcj"]
+[gd_scene load_steps=6 format=3 uid="uid://cfewjq68h7qcj"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_835iu"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_835iu"]
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="3_nmb50"]
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="4_q7crt"]
+[ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_2g1ft"]
 
 [node name="Level4" type="Node2D"]
 
@@ -24,3 +25,24 @@ position = Vector2(74, -227)
 
 [node name="Player" parent="." instance=ExtResource("4_q7crt")]
 position = Vector2(20, -14)
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.182423, 0.177929, 0.187587, 1)
+
+[node name="LightScene" parent="." instance=ExtResource("5_2g1ft")]
+position = Vector2(23, -42)
+
+[node name="LightScene2" parent="." instance=ExtResource("5_2g1ft")]
+position = Vector2(-57, -41)
+
+[node name="LightScene3" parent="." instance=ExtResource("5_2g1ft")]
+position = Vector2(-90, -121)
+
+[node name="LightScene4" parent="." instance=ExtResource("5_2g1ft")]
+position = Vector2(103, -57)
+
+[node name="LightScene5" parent="." instance=ExtResource("5_2g1ft")]
+position = Vector2(23, -233)
+
+[node name="LightScene6" parent="." instance=ExtResource("5_2g1ft")]
+position = Vector2(103, -232)
