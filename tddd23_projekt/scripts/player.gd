@@ -14,7 +14,7 @@ const SPEED := 100.0
 @export var footstep_pitch_jitter: float = 0.08       # +- pitch variance for variety
 @export var footstep_priority: int = 1                # AI weight (doors/explosions could be >1)
 
-var last_dir: Vector2 = Vector2.DOWN  # where we’re facing when idle
+var last_dir: Vector2 = Vector2.DOWN  # where we're facing when idle
 var _moving_strength := 0.0           # 0..1 how hard we're moving (for cadence)
 
 @onready var noise_ring: Node2D = $NoiseRing
@@ -119,14 +119,16 @@ func _throw_rock() -> void:
 	# send it in the last faced direction (cardinal)
 	rock.throw(last_dir)
 
-	# listen for the noise for future AI (optional)
-	rock.noise_emitted.connect(_on_rock_noise)
+	# UPDATED: Connect rock to all enemies
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if enemy.has_method("_on_noise_emitted"):
+			rock.noise_emitted.connect(enemy._on_noise_emitted)
 
 	# add to same parent as player (so it shares world/layers)
 	get_parent().add_child(rock)
 
 func _on_rock_noise(pos: Vector2) -> void:
-	# Placeholder: later you’ll broadcast this to enemies’ AI
+	# Placeholder: later you'll broadcast this to enemies' AI
 	print("Rock noise at: ", pos)
 
 # --- NEW: footstep "tick" ---

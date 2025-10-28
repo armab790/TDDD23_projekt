@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=4 uid="uid://d28ufl72uovtn"]
+[gd_scene load_steps=10 format=4 uid="uid://d28ufl72uovtn"]
 
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_uwrxv"]
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="3_lbhrr"]
@@ -175,12 +175,18 @@ texture = ExtResource("3_lnu2h")
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_lnu2h")
 
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_lbhrr"]
+vertices = PackedVector2Array(18, 90.2188, -219.359, 95.7422, -210.578, -50.0313, 18, -50.9531)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-220, -60, 28, -61, 28, 100, -230, 106)])
+
 [node name="Game" type="Node2D"]
 y_sort_enabled = true
 
 [node name="Level1" type="Node2D" parent="."]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="Level1"]
+visible = false
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="Floor" type="TileMapLayer" parent="Level1"]
@@ -201,6 +207,24 @@ position = Vector2(89, -84)
 
 [node name="NPC" parent="." instance=ExtResource("3_lbhrr")]
 position = Vector2(-27, -6)
+waypoints_path = NodePath("Waypoints")
+
+[node name="Waypoints" type="Node2D" parent="NPC"]
+
+[node name="Marker2D" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-52, 63)
+
+[node name="Marker2D2" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-49, -32)
+
+[node name="Marker2D3" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-155, -29)
+
+[node name="Marker2D4" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-155, 60)
 
 [node name="Player" parent="." instance=ExtResource("1_uwrxv")]
 position = Vector2(106, -16)
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_lbhrr")

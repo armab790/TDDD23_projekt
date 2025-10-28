@@ -1,0 +1,21 @@
+extends BTAction
+
+func _tick(delta: float) -> BT.Status:
+	var wps_val = blackboard.get_var("waypoints")
+	if typeof(wps_val) != TYPE_ARRAY:
+		return FAILURE
+
+	var wps: Array = wps_val
+	if wps.is_empty():
+		return FAILURE
+
+	var idx_val = blackboard.get_var("wp_index")
+	var idx: int
+	if idx_val is int:
+		idx = int(idx_val)
+	else:
+		idx = 0
+
+	var next_idx = (idx + 1) % wps.size()
+	blackboard.set_var("wp_index", next_idx)
+	return SUCCESS

@@ -22,17 +22,17 @@ script = ExtResource("1_11hie")
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 1536.0
+offset_bottom = 1024.0
 texture = ExtResource("2_3h7gc")
 stretch_mode = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 clip_contents = true
 layout_mode = 0
-offset_left = 1500.0
+offset_left = 500.0
 offset_top = 300.0
-offset_right = 2532.0
+offset_right = 1532.0
 offset_bottom = 2368.0
 scale = Vector2(0.3, 0.3)
 alignment = 1

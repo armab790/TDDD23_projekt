@@ -17,8 +17,8 @@
 [ext_resource type="BehaviorTree" uid="uid://djj3ohs8y2nqr" path="res://ai/trees/npc.tres" id="15_rwfh4"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4cv6p"]
-radius = 5.0
-height = 18.0
+radius = 4.0
+height = 14.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8ryoh"]
 animations = [{
@@ -150,3 +150,5 @@ behavior_tree = ExtResource("15_rwfh4")
 blackboard_plan = SubResource("BlackboardPlan_4cv6p")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+target_desired_distance = 20.0
+avoidance_enabled = true
