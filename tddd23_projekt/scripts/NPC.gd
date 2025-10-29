@@ -55,7 +55,7 @@ func _ready() -> void:
 		current_index = 0
 		agent.target_position = waypoints[0]
 	else:
-		print("⚠️ NPC has no waypoints!")
+		print("NPC has no waypoints!")
 
 	# connect to player noise
 	if player and player.has_signal("noise_emitted"):
@@ -113,7 +113,7 @@ func _process_investigation(delta: float) -> void:
 	
 	if agent.is_navigation_finished():
 		investigating = false
-		print("👀 Investigation done, returning to patrol")
+		print("Investigation done, returning to patrol")
 		if waypoints.size() > 0:
 			agent.target_position = waypoints[current_index]
 	else:
@@ -125,7 +125,7 @@ func hear_noise(pos: Vector2) -> void:
 	investigate_pos = pos
 	agent.target_position = pos
 	_hear_grace = hear_grace_time
-	print("🔊 Enemy heard noise at ", pos)
+	print("Enemy heard noise at ", pos)
 
 
 # ----------------------------------------------------------------
