@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 # --- Movement & pathing ---
-@export var speed: float = 80.0
+@export var speed: float = 40.0
 @export var wait_time: float = 1.2
 @export var waypoints_path: NodePath
 @onready var agent: NavigationAgent2D = $NavigationAgent2D
@@ -18,8 +18,8 @@ extends CharacterBody2D
 @export var hear_grace_time: float = 0.40
 
 # --- Turning / animation ---
-@export var turn_rate_rad: float = 1.0
-@export var turn_accel: float = 0.20
+@export var turn_speed: float = 1.0  # How fast to turn (radians per second)
+@export var move_threshold: float = 5.0  # Don't move until mostly facing target
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 @onready var player: CharacterBody2D = get_node_or_null("../Player")
 
@@ -32,18 +32,16 @@ var investigating := false
 var investigate_pos := Vector2.ZERO
 
 var last_dir: Vector2 = Vector2.DOWN
-var facing_dir: Vector2 = Vector2.DOWN
+var facing_angle: float = PI / 2  # Start facing down (90 degrees)
 var _hear_cooldown := 0.0
 var _hear_grace := 0.0
-var _turning_to_noise := false
-var _turn_target: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
-	add_to_group("enemies")  # ADD THIS LINE
+	add_to_group("enemies")
 	randomize()
-	facing_dir = Vector2.DOWN
-	last_dir = facing_dir
+	last_dir = Vector2.DOWN
+	facing_angle = last_dir.angle()
 
 	# collect waypoints
 	if waypoints_path != NodePath():
@@ -94,19 +92,10 @@ func _process_patrol(delta: float) -> void:
 		return
 
 	if agent.is_navigation_finished():
-		print("✅ Reached waypoint ", current_index, " at ", global_position)
 		waiting = true
 		wait_timer = wait_time
 	else:
-		var next_pos = agent.get_next_path_position()
-		var distance_to_next = global_position.distance_to(next_pos)
-		
-		# Debug when stuck
-		if velocity.length() < 1.0 and distance_to_next > 5.0:
-			print("⚠️ Stuck at ", global_position, " trying to reach ", agent.target_position)
-			print("   Next path point: ", next_pos, " (dist: ", distance_to_next, ")")
-		
-		_move_towards(next_pos, delta)
+		_move_towards_smooth(agent.get_next_path_position(), delta)
 
 
 func _next_waypoint() -> void:
@@ -118,13 +107,17 @@ func _next_waypoint() -> void:
 # investigation behaviour
 # ----------------------------------------------------------------
 func _process_investigation(delta: float) -> void:
+	# Update target if chasing player
+	if player and investigating:
+		agent.target_position = player.global_position
+	
 	if agent.is_navigation_finished():
 		investigating = false
 		print("👀 Investigation done, returning to patrol")
 		if waypoints.size() > 0:
 			agent.target_position = waypoints[current_index]
 	else:
-		_move_towards(agent.get_next_path_position(), delta)
+		_move_towards_smooth(agent.get_next_path_position(), delta)
 
 
 func hear_noise(pos: Vector2) -> void:
@@ -136,37 +129,64 @@ func hear_noise(pos: Vector2) -> void:
 
 
 # ----------------------------------------------------------------
-# shared movement + animation helpers
+# SMOOTH MOVEMENT with turning
 # ----------------------------------------------------------------
-func _move_towards(target_pos: Vector2, delta: float) -> void:
-	var dir = target_pos - global_position
-	var distance = dir.length()
+func _move_towards_smooth(target_pos: Vector2, delta: float) -> void:
+	var to_target = target_pos - global_position
+	var distance = to_target.length()
 	
-	if distance > agent.target_desired_distance:
-		velocity = dir.normalized() * speed
-	else:
+	if distance < 1.0:
 		velocity = Vector2.ZERO
+		move_and_slide()
+		return
 	
-	# This is the key - move_and_slide() handles collisions
+	var target_angle = to_target.angle()
+	
+	# Smooth turn towards target
+	var angle_diff = _angle_difference(facing_angle, target_angle)
+	var turn_amount = sign(angle_diff) * min(abs(angle_diff), turn_speed * delta)
+	facing_angle += turn_amount
+	
+	# Only move if mostly facing the target
+	var facing_alignment = abs(angle_diff)
+	if facing_alignment < deg_to_rad(move_threshold):
+		# Move forward in facing direction
+		var move_dir = Vector2.from_angle(facing_angle)
+		velocity = move_dir * speed
+	else:
+		# Still turning, slow down or stop
+		velocity = velocity.lerp(Vector2.ZERO, 5.0 * delta)
+	
 	move_and_slide()
-	
-	# If stuck (colliding), try to get unstuck
-	if get_slide_collision_count() > 0:
-		var collision = get_slide_collision(0)
-		var slide_dir = velocity.slide(collision.get_normal())
-		velocity = slide_dir
 
 
+# Get shortest angle difference (handles wrapping)
+func _angle_difference(from: float, to: float) -> float:
+	var diff = to - from
+	while diff > PI:
+		diff -= TAU
+	while diff < -PI:
+		diff += TAU
+	return diff
+
+
+# ----------------------------------------------------------------
+# ANIMATION based on facing direction
+# ----------------------------------------------------------------
 func _update_animation() -> void:
-	var v := velocity
-	if v.length() > 0.01:
-		var axis_dir: Vector2
-		if abs(v.x) > abs(v.y):
-			axis_dir = Vector2(sign(v.x), 0)
-		else:
-			axis_dir = Vector2(0, sign(v.y))
-		last_dir = axis_dir
-
+	# Convert facing angle to cardinal direction
+	var facing_dir = Vector2.from_angle(facing_angle)
+	
+	var axis_dir: Vector2
+	if abs(facing_dir.x) > abs(facing_dir.y):
+		axis_dir = Vector2(sign(facing_dir.x), 0)
+	else:
+		axis_dir = Vector2(0, sign(facing_dir.y))
+	
+	last_dir = axis_dir
+	
+	# Play animation based on movement
+	if velocity.length() > 0.5:
 		match last_dir:
 			Vector2.RIGHT: anim.play("walkRight")
 			Vector2.LEFT:  anim.play("walkLeft")
@@ -181,15 +201,15 @@ func _update_animation() -> void:
 
 
 # ----------------------------------------------------------------
-# vision + hearing (same as before)
+# vision + hearing
 # ----------------------------------------------------------------
 func _can_see_player(p: Node2D) -> bool:
 	var to_p: Vector2 = p.global_position - global_position
 	if to_p.length() > view_distance:
 		return false
 
-	var facing: Vector2 = facing_dir if velocity.length() < 0.001 else velocity.normalized()
-	var ang_deg = rad_to_deg(acos(clamp(facing.dot(to_p.normalized()), -1.0, 1.0)))
+	var facing_dir = Vector2.from_angle(facing_angle)
+	var ang_deg = rad_to_deg(acos(clamp(facing_dir.dot(to_p.normalized()), -1.0, 1.0)))
 	if ang_deg > fov_deg * 0.5:
 		return false
 
@@ -217,4 +237,3 @@ func _on_noise_emitted(pos: Vector2, radius: float, loudness: float, priority: i
 	if randf() <= react_prob:
 		hear_noise(pos)
 		_hear_cooldown = react_cooldown
-		

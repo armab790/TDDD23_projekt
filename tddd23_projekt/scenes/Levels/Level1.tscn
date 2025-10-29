@@ -7,9 +7,9 @@
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_7orvs"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_7orvs"]
-vertices = PackedVector2Array(-11, -23.8203, 4.3125, -38, 19.7109, -38, 24.7422, 30.4531, -2.17188, -8, -11, -97, 1.29688, -132.922, -102.773, -132.078, -86, -97, -100.203, -16.3984, -86, -25.1797, -68, -14.3906, -112.711, 65.1875, -116.273, 13.2188, -68, 14.2109, -47, 59.7813, -47, -8, -1.17188, 50, 65.2266, 50, 65.7422, 28.5)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(1, 0, 5, 6), PackedInt32Array(7, 6, 5, 8), PackedInt32Array(9, 7, 8, 10), PackedInt32Array(11, 9, 10, 0), PackedInt32Array(12, 13, 14, 15), PackedInt32Array(16, 15, 14, 11), PackedInt32Array(16, 11, 0, 4), PackedInt32Array(17, 4, 3), PackedInt32Array(18, 17, 3, 19)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-113, -142, 11, -143, 14, -48, 29, -48, 34, 20, 76, 18, 75, 60, -11, 60, -12, 2, -37, 2, -37, 69, -122, 76, -127, 3, -78, 4, -78, -5, -110, -7)])
+vertices = PackedVector2Array(-21.25, -33.2734, -19.7422, -92, 1.29688, -132.922, 4.3125, -38, -2.17188, -8, -102.773, -132.078, -78.25, -92, -100.203, -16.3984, -76.75, -31.7266, -68.3672, -14.4219, 24.7422, 30.4531, 65.7422, 28.5, 65.2266, 50, -1.17188, 50, 19.7109, -38, -47, -8, -66.5938, 30, -47, 65.8828, -114.172, 65.1094, -114.813, 30)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 2, 1, 6), PackedInt32Array(7, 5, 6, 8), PackedInt32Array(9, 7, 8, 0), PackedInt32Array(10, 11, 12, 13), PackedInt32Array(14, 10, 13, 4, 3), PackedInt32Array(0, 4, 15, 9), PackedInt32Array(16, 9, 15, 17), PackedInt32Array(16, 17, 18, 19)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-113, -142, 11, -143, 14, -48, 29, -48, 34, 20, 76, 18, 75, 60, -11, 60, -12, 2, -37, 2, -37, 76, -124, 75, -125, 20, -77, 20, -78, -5, -110, -7)])
 
 [node name="Level1" type="Node2D"]
 
@@ -78,4 +78,5 @@ position = Vector2(-9, -137)
 navigation_polygon = SubResource("NavigationPolygon_7orvs")
 
 [node name="Polygon2D" type="Polygon2D" parent="NavigationRegion2D"]
-polygon = PackedVector2Array(-76, -35, -21, -34, -21, -87, -76, -87)
+color = Color(1, 1, 1, 0)
+polygon = PackedVector2Array(-67, -42, -31, -43, -30, -82, -68, -82)
