@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b18rd0s7an0cl"]
+[gd_scene load_steps=8 format=3 uid="uid://b18rd0s7an0cl"]
 
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_kul1s"]
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_lsa2l"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="4_nrbuy"]
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="5_nrbuy"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="6_emect"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_1ignd"]
 
 [node name="Level5" type="Node2D"]
 
@@ -73,3 +74,5 @@ position = Vector2(232, -85)
 
 [node name="LightScene6" parent="." instance=ExtResource("6_emect")]
 position = Vector2(215, -184)
+
+[node name="ScreenFX" parent="." instance=ExtResource("7_1ignd")]

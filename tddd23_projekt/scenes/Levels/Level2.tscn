@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://by6jbexbg0mpy"]
+[gd_scene load_steps=10 format=3 uid="uid://by6jbexbg0mpy"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_6sp58"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_relvm"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="4_qrxlh"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_qrxlh"]
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="6_o7egn"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_84na2"]
 
 [sub_resource type="GDScript" id="GDScript_0vwrv"]
 
@@ -102,3 +103,5 @@ polygon = PackedVector2Array(8, -22, 7, 24, 24, 24, 24, -23)
 [node name="Polygon2D4" type="Polygon2D" parent="NavigationRegion2D"]
 visible = false
 polygon = PackedVector2Array(9, -124, 8, -69, 24, -70, 23, -127)
+
+[node name="ScreenFX" parent="." instance=ExtResource("7_84na2")]
