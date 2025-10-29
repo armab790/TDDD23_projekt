@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cu8n54g151jby"]
+[gd_scene load_steps=6 format=3 uid="uid://cu8n54g151jby"]
 
 [ext_resource type="Script" uid="uid://w4ga7b08q310" path="res://scripts/Transition.gd" id="1_fyjtc"]
 [ext_resource type="AudioStream" uid="uid://pac1camhtd4u" path="res://audios/SFX/New_Scene.mp3" id="2_1m0lo"]
 [ext_resource type="Texture2D" uid="uid://boaquujf33fgb" path="res://assets/images/nextlevel.png" id="3_x44xi"]
+[ext_resource type="Texture2D" uid="uid://c05urlq1p0w71" path="res://assets/images/caught.png" id="4_aavpm"]
 [ext_resource type="Texture2D" uid="uid://cw1n2vdpkj6iw" path="res://assets/images/finish.png" id="4_swlj3"]
 
 [node name="Transition" type="CanvasLayer"]
@@ -19,6 +20,12 @@ visible = false
 offset_right = 1536.0
 offset_bottom = 1024.0
 texture = ExtResource("4_swlj3")
+
+[node name="caught" type="TextureRect" parent="."]
+visible = false
+offset_right = 1536.0
+offset_bottom = 1024.0
+texture = ExtResource("4_aavpm")
 
 [node name="Shade" type="ColorRect" parent="."]
 z_index = 100

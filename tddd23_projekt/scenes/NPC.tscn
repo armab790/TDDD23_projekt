@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://bi51sinak2u"]
+[gd_scene load_steps=20 format=3 uid="uid://bi51sinak2u"]
 
 [ext_resource type="Texture2D" uid="uid://ubohpjqdyt35" path="res://assets/sprites/PNGs/AgentBackStill.png" id="1_5t8s8"]
 [ext_resource type="Script" uid="uid://b5fxbald8q8q7" path="res://scripts/NPC.gd" id="1_jiysx"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://cwekt6clae64n" path="res://assets/sprites/PNGs/AgentSideLeftStep.png" id="11_a6gbn"]
 [ext_resource type="Texture2D" uid="uid://d221f7uvqtjps" path="res://assets/sprites/PNGs/AgentSideRightStep.png" id="12_kjnhq"]
 [ext_resource type="BehaviorTree" uid="uid://djj3ohs8y2nqr" path="res://ai/trees/npc.tres" id="15_rwfh4"]
+[ext_resource type="AudioStream" uid="uid://c2l5ujd3w5sdq" path="res://audios/SFX/Heardbeat.mp3" id="16_4cv6p"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4cv6p"]
 radius = 4.0
@@ -155,3 +156,6 @@ blackboard_plan = SubResource("BlackboardPlan_4cv6p")
 target_desired_distance = 20.0
 path_postprocessing = 1
 avoidance_enabled = true
+
+[node name="Heartbeat" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("16_4cv6p")

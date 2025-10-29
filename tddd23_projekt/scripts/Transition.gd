@@ -16,13 +16,37 @@ var _new_scene_player: AudioStreamPlayer
 @export var card_fade_in: float = 0.25
 @export var card_fade_out: float = 0.25
 
+@export_file("*.png") var caught_card_path := "res://assets/images/caught.png"
+@export_file("*.mp3") var caught_sfx_path := "res://audios/SFX/Tense.mp3"
+@export var caught_hold: float = 0.2                    # how long to show the card
+@export var caught_fade_in: float = 0.25
+@export var caught_fade_out: float = 0.25
+@export var caught_sfx: AudioStream                     # optional sound when caught
+
+
 var _card: TextureRect
 var _card_tw: Tween
+
 
 
 # -----------------------------
 # Helpers
 # -----------------------------
+
+func _show_caught_card() -> void:
+	var tex: Texture2D = null
+	if ResourceLoader.exists(caught_card_path):
+		tex = load(caught_card_path)
+	if tex:
+		# temporarily override fade times for caught screen
+		var old_in := card_fade_in
+		var old_out := card_fade_out
+		card_fade_in = caught_fade_in
+		card_fade_out = caught_fade_out
+		await _show_card(tex)
+		card_fade_in = old_in
+		card_fade_out = old_out
+
 
 func _play_new_scene_sfx_and_wait() -> void:
 	if new_scene_stream == null:
@@ -30,6 +54,8 @@ func _play_new_scene_sfx_and_wait() -> void:
 
 	_new_scene_player.stream = new_scene_stream
 	_new_scene_player.play()
+	
+	
 
 	var wait_time = 1.5
 
@@ -146,21 +172,27 @@ func caught_and_restart() -> void:
 		return
 	busy = true
 
-	# Slow-mo + fade to black in parallel
+	# Slow-mo + fade to black in parallel (as you had)
 	var tw := create_tween()
 	tw.parallel().tween_property(Engine, "time_scale", 0.15, 0.25)
 	tw.parallel().tween_property(shade, "modulate:a", 1.0, 0.35)
 	await tw.finished
 
-	# Use a timer that ignores time_scale so we don’t stall
-	await get_tree().create_timer(0.05, false, true).timeout
+	# Show the "caught" card on top of black and (optionally) play SFX
+	await _show_caught_card()
 
+	# Hold the card for a moment
+	await get_tree().create_timer(caught_hold, false, true).timeout
+
+	# Reload the scene while we (Transition) persist
 	get_tree().reload_current_scene()
-
-	# Reset time and fade back in after reload
 	Engine.time_scale = 1.0
 	await get_tree().process_frame
-	await fade_from_black(3.35)
+
+	# Hide the card and fade back in
+	if _card.visible:
+		await _hide_card()
+	await fade_from_black(0.8)
 
 	busy = false
 

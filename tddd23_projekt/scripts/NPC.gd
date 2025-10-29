@@ -31,10 +31,50 @@ var wait_timer := 0.0
 var investigating := false
 var investigate_pos := Vector2.ZERO
 
+# --- Heartbeat (investigate/pursue) ---
+@export_file("*.mp3") var heartbeat_path := "res://audios/SFX/Heartbeat.mp3"
+@export var heartbeat_bus: String = "Master"
+@export var heartbeat_max_db: float = -8.0     # loud when active
+@export var heartbeat_min_db: float = -40.0    # effectively silent when inactive
+@export var heartbeat_fade_in: float = 0.6
+@export var heartbeat_fade_out: float = 0.8
+
+@onready var heartbeat: AudioStreamPlayer2D = $Heartbeat
+var _hb_on := false
+var _hb_tw: Tween
+
+
 var last_dir: Vector2 = Vector2.DOWN
 var facing_angle: float = PI / 2  # Start facing down (90 degrees)
 var _hear_cooldown := 0.0
 var _hear_grace := 0.0
+
+func _update_heartbeat(active: bool) -> void:
+	if heartbeat == null:
+		return
+	if _hb_on == active:
+		return
+	_hb_on = active
+
+	if _hb_tw:
+		_hb_tw.kill()
+	_hb_tw = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+	var fx = get_tree().get_first_node_in_group("screen_fx")
+
+	if active:
+		if not heartbeat.playing:
+			heartbeat.play()
+		_hb_tw.tween_property(heartbeat, "volume_db", heartbeat_max_db, heartbeat_fade_in)
+		if fx and fx.has_method("start_pulse"):
+			fx.start_pulse(1.2, 0.36) # you can lower to 0.04 later
+		else:
+			print("[NPC] No ScreenFX found (group 'screen_fx').")
+	else:
+		_hb_tw.tween_property(heartbeat, "volume_db", heartbeat_min_db, heartbeat_fade_out)
+		_hb_tw.tween_callback(Callable(heartbeat, "stop"))
+		if fx and fx.has_method("stop_pulse"):
+			fx.stop_pulse()
 
 
 func _ready() -> void:
@@ -42,6 +82,22 @@ func _ready() -> void:
 	randomize()
 	last_dir = Vector2.DOWN
 	facing_angle = last_dir.angle()
+	
+	# Heartbeat audio (create if missing)
+	if heartbeat == null:
+		heartbeat = AudioStreamPlayer2D.new()
+		heartbeat.name = "Heartbeat"
+		add_child(heartbeat)
+
+	heartbeat.bus = heartbeat_bus
+	heartbeat.autoplay = false
+	heartbeat.volume_db = heartbeat_min_db
+
+	if heartbeat.stream == null and ResourceLoader.exists(heartbeat_path):
+		heartbeat.stream = load(heartbeat_path)
+	# Try to loop (depends on stream type/import settings)
+	if heartbeat.stream and heartbeat.stream.has_method("set_loop"):
+		heartbeat.stream.set_loop(true)
 
 	# collect waypoints
 	if waypoints_path != NodePath():
@@ -70,6 +126,12 @@ func _physics_process(delta: float) -> void:
 		_process_investigation(delta)
 	else:
 		_process_patrol(delta)
+		
+	# Consider "pursuing" when investigating OR briefly after hearing (grace)
+	var pursuing := investigating or (_hear_grace > 0.0)
+	# (If you want heartbeat also when actually seeing the player, add: `or (player and _can_see_player(player))`)
+	_update_heartbeat(pursuing)
+
 
 	_update_animation()
 

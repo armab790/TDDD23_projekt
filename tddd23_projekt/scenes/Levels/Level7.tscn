@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://ph224w0irybe"]
+[gd_scene load_steps=7 format=3 uid="uid://ph224w0irybe"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="2_ra5g2"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="3_3ljh4"]
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="4_5uhrh"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_6ydu5"]
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="6_7r0an"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="6_kif8y"]
 
 [node name="Level7" type="Node2D"]
 
@@ -49,3 +50,5 @@ position = Vector2(183, -40)
 
 [node name="LightScene6" parent="." instance=ExtResource("5_6ydu5")]
 position = Vector2(135, -153)
+
+[node name="ScreenFX" parent="." instance=ExtResource("6_kif8y")]
