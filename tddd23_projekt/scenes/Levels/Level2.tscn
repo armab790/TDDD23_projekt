@@ -36,7 +36,6 @@ position = Vector2(-104, 6)
 position = Vector2(-105, 2)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
 position = Vector2(-40, -58)
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
@@ -101,17 +100,16 @@ position = Vector2(-94, 7)
 navigation_polygon = SubResource("NavigationPolygon_o7egn")
 
 [node name="Polygon2D" type="Polygon2D" parent="NavigationRegion2D"]
-color = Color(1, 1, 1, 0)
+visible = false
 polygon = PackedVector2Array(54, -26, 73, -26, 73, -72, 54, -72)
 
 [node name="Polygon2D2" type="Polygon2D" parent="NavigationRegion2D"]
-color = Color(1, 1, 1, 0)
-polygon = PackedVector2Array(-41, -72, -42, -23, -23, -23, -23, -72)
+visible = false
+polygon = PackedVector2Array(-41, -72, -42, -23, -23, -23, -23, -73)
 
 [node name="Polygon2D3" type="Polygon2D" parent="NavigationRegion2D"]
-color = Color(1, 1, 1, 0)
-polygon = PackedVector2Array(8, -22, 7, 24, 24, 24, 24, -22)
+visible = false
+polygon = PackedVector2Array(8, -22, 7, 24, 24, 24, 24, -23)
 
 [node name="Polygon2D4" type="Polygon2D" parent="NavigationRegion2D"]
-color = Color(1, 1, 1, 0)
 polygon = PackedVector2Array(9, -124, 8, -69, 24, -70, 23, -127)

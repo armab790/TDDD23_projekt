@@ -140,6 +140,8 @@ shape = SubResource("CapsuleShape2D_4cv6p")
 
 [node name="FOV" type="Node2D" parent="."]
 script = ExtResource("3_rwfh4")
+fill_color = Color(1, 0.820504, 0.404921, 0.15)
+line_color = Color(0.984314, 0.721569, 0.286275, 0.298039)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_8ryoh")
