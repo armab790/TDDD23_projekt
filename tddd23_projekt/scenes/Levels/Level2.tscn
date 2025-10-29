@@ -10,8 +10,8 @@
 [sub_resource type="GDScript" id="GDScript_0vwrv"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_o7egn"]
-vertices = PackedVector2Array(-1.79688, -31.4063, -2.88281, 18.7813, -13, -13, -13, -83.5703, -2.1875, -58.3438, 93.3828, -112.883, 97.3828, -7.85938, 83, -16, 83, -82, 33.2578, -112.203, 44, -82, 34.1719, -60.6172, 44, -16, -63.8594, 18.1094, -52.2109, -13, -62.1328, -111.109, -50.8125, -81.4688, -1.21875, -111.797, 34, -33.6406, 34, 18.9063, 210.211, 18.0391, 176.906, -8.99219, 210.781, -8.21875)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 5, 8, 10), PackedInt32Array(11, 9, 10, 12), PackedInt32Array(2, 1, 13, 14), PackedInt32Array(14, 13, 15, 16), PackedInt32Array(16, 15, 17, 3), PackedInt32Array(3, 17, 4), PackedInt32Array(18, 0, 4, 11), PackedInt32Array(18, 11, 12, 19), PackedInt32Array(20, 19, 12, 6), PackedInt32Array(21, 22, 20, 6), PackedInt32Array(6, 12, 7)])
+vertices = PackedVector2Array(-1.78125, -32, -2.88281, 18.7813, -13, -13, -13, -82, -2.1875, -58.3438, 93.3828, -112.883, 97.3828, -7.85938, 83, -16, 83, -82, 33.2578, -112.203, 44, -82, 34.1719, -60.6172, 44, -16, -63.8594, 18.1094, -52.2109, -13, -62.1328, -111.109, -50.7969, -82, -1.21875, -111.797, 176.906, -8.99219, 210.781, -8.21875, 210.211, 18.0391, 34, 18.9063, 34, -32)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 5, 8, 10), PackedInt32Array(11, 9, 10, 12), PackedInt32Array(2, 1, 13, 14), PackedInt32Array(14, 13, 15, 16), PackedInt32Array(16, 15, 17, 3), PackedInt32Array(3, 17, 4), PackedInt32Array(18, 19, 20, 21, 6), PackedInt32Array(7, 6, 21, 12), PackedInt32Array(12, 21, 22, 11), PackedInt32Array(4, 11, 22, 0)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-72, -121, 103, -123, 107, -18, 177, -19, 221, -18, 220, 28, 17, 29, -74, 28)])
 
 [node name="Level2" type="Node2D"]
@@ -85,17 +85,33 @@ position = Vector2(-48, -35)
 [node name="Marker2D6" type="Marker2D" parent="NPC/Waypoints"]
 position = Vector2(-93, -35)
 
+[node name="Marker2D7" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-96, -84)
+
+[node name="Marker2D8" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-144, -84)
+
+[node name="Marker2D9" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-143, 9)
+
+[node name="Marker2D10" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-94, 7)
+
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 navigation_polygon = SubResource("NavigationPolygon_o7egn")
 
 [node name="Polygon2D" type="Polygon2D" parent="NavigationRegion2D"]
+color = Color(1, 1, 1, 0)
 polygon = PackedVector2Array(54, -26, 73, -26, 73, -72, 54, -72)
 
 [node name="Polygon2D2" type="Polygon2D" parent="NavigationRegion2D"]
-polygon = PackedVector2Array(-41, -72, -42, -23, -23, -23, -23, -73)
+color = Color(1, 1, 1, 0)
+polygon = PackedVector2Array(-41, -72, -42, -23, -23, -23, -23, -72)
 
 [node name="Polygon2D3" type="Polygon2D" parent="NavigationRegion2D"]
-polygon = PackedVector2Array(8, -22, 7, 24, 24, 24, 24, -23)
+color = Color(1, 1, 1, 0)
+polygon = PackedVector2Array(8, -22, 7, 24, 24, 24, 24, -22)
 
 [node name="Polygon2D4" type="Polygon2D" parent="NavigationRegion2D"]
+color = Color(1, 1, 1, 0)
 polygon = PackedVector2Array(9, -124, 8, -69, 24, -70, 23, -127)

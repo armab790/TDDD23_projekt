@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 # --- Movement & pathing ---
 @export var speed: float = 40.0
-@export var wait_time: float = 1.2
+@export var wait_time: float = 0.0
 @export var waypoints_path: NodePath
 @onready var agent: NavigationAgent2D = $NavigationAgent2D
 
