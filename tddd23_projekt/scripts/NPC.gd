@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 # --- Movement & pathing ---
 @export var speed: float = 40.0
-@export var chase_speed: float = 50.0
+@export var chase_speed: float = 40.0
 @export var wait_time: float = 0.0
 @export var investigation_wait_time: float = 2.0
 @export var chase_timeout: float = 5.0
@@ -17,7 +17,7 @@ extends CharacterBody2D
 # --- Hearing (probabilistic with distance) ---
 @export var hear_radius_fallback: float = 100.0
 @export var prob_at_edge: float = 0.10     # reaction probability at max radius
-@export var prob_at_center: float = 0.85   # reaction probability at source
+@export var prob_at_center: float = 0.99   # reaction probability at source
 @export var react_cooldown: float = 0.30
 @export var hear_grace_time: float = 0.40
 
@@ -69,14 +69,18 @@ func _get_screen_fx() -> Node:
 		return _fx_cached
 	_fx_cached = get_tree().get_first_node_in_group("screen_fx")
 	return _fx_cached
+	
+func refresh_alert_fx() -> void:
+	var pursuing := chasing_player or (investigating and investigating_player)
+	_update_heartbeat(pursuing, true)
 
 # -----------------------------
 # Heartbeat & pulse
 # -----------------------------
-func _update_heartbeat(active: bool) -> void:
+func _update_heartbeat(active: bool, force: bool = false) -> void:
 	if heartbeat == null:
 		return
-	if _hb_on == active:
+	if (not force) and (_hb_on == active):
 		return
 	_hb_on = active
 

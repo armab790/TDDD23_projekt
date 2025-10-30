@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cfewjq68h7qcj"]
+[gd_scene load_steps=9 format=3 uid="uid://cfewjq68h7qcj"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_835iu"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_835iu"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="4_q7crt"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_2g1ft"]
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="6_2o00k"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_ctf7r"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_2g1ft"]
 vertices = PackedVector2Array(-34, -22, -9.99219, -45.5313, 38.8828, -47.5703, 38.1094, 20.7813, 9.3125, 6, 117, -165, 117, -201, 148.938, -232.047, 148.172, -79, 124.5, -122, -6.82031, -232.938, 92, -201, 52, -202, -7.11719, -77.1563, -34, -74.5391, -4.82813, -117, 52.4219, -123, 52, -166, 92, -165, 75.6875, -123, 27, -202, 27, -166, 196.078, -79, 196.922, 20, 91.2578, 20, 90.3203, 7.82813, 127.523, -63.2109, 102, -122, 102, -91, 76.7031, -91, 78, -47.0781, 78, -62.1875, 50.4219, -76.1563, 59.2813, 4.90625, 60.7578, -43.0234, 10.3203, 20.1875, -102.93, 6, -76.2969, -22, -102.07, -117, -74.7031, -76.4688)
@@ -33,7 +34,6 @@ position = Vector2(74, -227)
 position = Vector2(20, -14)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="LightScene" parent="." instance=ExtResource("5_2g1ft")]
@@ -101,3 +101,6 @@ position = Vector2(-61, -123)
 
 [node name="Marker2D8" type="Marker2D" parent="NPC/Waypoints"]
 position = Vector2(-61, -193)
+
+[node name="ScreenFX" parent="." instance=ExtResource("7_ctf7r")]
+pulse_color = Color(0.105882, 0, 0, 1)

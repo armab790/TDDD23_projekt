@@ -12,7 +12,7 @@ var _t := 0.0
 func _ready() -> void:
 	# Draw above everything and always process, even if game pauses/slows
 	layer = 500
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_mode = Node.PROCESS_MODE_PAUSABLE 
 
 	add_to_group("screen_fx")
 
@@ -27,7 +27,7 @@ func _ready() -> void:
 	pulse.offset_right = 0
 	pulse.offset_bottom = 0
 	pulse.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pulse.z_index = 9999
+	pulse.z_index = 100
 	pulse.color = pulse_color
 	pulse.visible = true
 	pulse.modulate = Color(1, 1, 1, 0.0)      # animate modulate.a
@@ -46,6 +46,8 @@ func start_pulse(rate: float = -1.0, amp: float = -1.0) -> void:
 
 func stop_pulse() -> void:
 	_on = false
+	if is_instance_valid(pulse):
+		pulse.modulate.a = 0.0
 	print("[ScreenFX] pulse OFF")
 
 func _process(delta: float) -> void:
