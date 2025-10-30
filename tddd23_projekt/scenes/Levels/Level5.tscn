@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b18rd0s7an0cl"]
+[gd_scene load_steps=9 format=3 uid="uid://b18rd0s7an0cl"]
 
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_kul1s"]
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_lsa2l"]
@@ -7,6 +7,11 @@
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="5_nrbuy"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="6_emect"]
 [ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_1ignd"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_emect"]
+vertices = PackedVector2Array(22.8672, 4.24219, -37.6563, 5.72656, -36.3203, -36, -9.53906, -36, 21.8672, -73.7891, -7.42969, -74, 200.727, -183.289, 245.922, -184.68, 245.07, -73.9063, 199.727, -147.047, -220.539, -144.938, 134, -72.9063, 90, -75.2109, 134, -26.6875, 90, -25.3203, -75.2188, -74, -74.2109, -26.8438, -119, -26.1484, -119, -72.9297, -263, -73.9297, -263, -242, -216.672, -172.031, 117.93, -171.031, -183.188, -242, -136.82, -240, -182.18, -295.148, -137.82, -295.844, 71.5391, -240, 117.063, -301.32, 74.5234, -302.688)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 0, 3, 5), PackedInt32Array(6, 7, 8, 9), PackedInt32Array(10, 9, 8, 11, 12), PackedInt32Array(13, 14, 12, 11), PackedInt32Array(10, 12, 4, 5), PackedInt32Array(10, 5, 15), PackedInt32Array(16, 17, 18, 15), PackedInt32Array(10, 15, 18, 19), PackedInt32Array(10, 19, 20, 21), PackedInt32Array(22, 21, 20, 23, 24), PackedInt32Array(25, 26, 24, 23), PackedInt32Array(22, 24, 27), PackedInt32Array(28, 22, 27, 29)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-192, -305, -128, -306, -127, -250, 62, -250, 65, -313, 127, -311, 128, -161, -208, -162, -209, -155, 190, -157, 191, -193, 256, -195, 255, -64, 144, -63, 144, -17, 80, -15, 80, -65, 32, -64, 33, 14, -48, 16, -46, -46, -19, -46, -18, -64, -65, -64, -64, -17, -129, -16, -129, -63, -273, -64, -273, -252, -193, -252)])
 
 [node name="Level5" type="Node2D"]
 
@@ -22,9 +27,6 @@ layer_0/tile_data = PackedInt32Array(-983051, 458752, 8, -917515, 458752, 9, -26
 [node name="Door" parent="." instance=ExtResource("2_xao72")]
 position = Vector2(232, -164)
 
-[node name="NPC" parent="." instance=ExtResource("4_nrbuy")]
-position = Vector2(-238, -106)
-
 [node name="SpawnPoint" type="Marker2D" parent="." groups=["spawn_point"]]
 
 [node name="Lever" parent="." groups=["levers"] instance=ExtResource("5_nrbuy")]
@@ -34,6 +36,7 @@ position = Vector2(104, -293)
 position = Vector2(-168, -291)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="LightScene" parent="." instance=ExtResource("6_emect")]
@@ -76,3 +79,24 @@ position = Vector2(232, -85)
 position = Vector2(215, -184)
 
 [node name="ScreenFX" parent="." instance=ExtResource("7_1ignd")]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_emect")
+
+[node name="NPC" parent="." instance=ExtResource("4_nrbuy")]
+position = Vector2(95, -198)
+waypoints_path = NodePath("Waypoints")
+
+[node name="Waypoints" type="Node2D" parent="NPC"]
+
+[node name="Marker2D" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-1, 7)
+
+[node name="Marker2D2" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-335, 9)
+
+[node name="Marker2D3" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(-332, 101)
+
+[node name="Marker2D4" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(124, 102)

@@ -2,7 +2,10 @@ extends CharacterBody2D
 
 # --- Movement & pathing ---
 @export var speed: float = 40.0
+@export var chase_speed: float = 80.0  # Faster when chasing player
 @export var wait_time: float = 0.0
+@export var investigation_wait_time: float = 2.0  # How long to look around at noise location
+@export var chase_timeout: float = 5.0  # Give up chasing if no visual contact for this long
 @export var waypoints_path: NodePath
 @onready var agent: NavigationAgent2D = $NavigationAgent2D
 
@@ -30,8 +33,12 @@ var waiting := false
 var wait_timer := 0.0
 var investigating := false
 var investigate_pos := Vector2.ZERO
+var investigation_timer := 0.0
+var chasing_player := false  # Are we actively chasing?
+var last_saw_player_timer := 0.0  # NEW: Time since last visual contact
+var last_player_pos := Vector2.ZERO  # NEW: Last known player position
 
-# --- Heartbeat (investigate/pursue) ---
+# --- Heartbeat (investigate/pursue) --
 @export_file("*.mp3") var heartbeat_path := "res://audios/SFX/Heartbeat.mp3"
 @export var heartbeat_bus: String = "Master"
 @export var heartbeat_max_db: float = -8.0     # loud when active
@@ -122,6 +129,22 @@ func _physics_process(delta: float) -> void:
 	_hear_cooldown = max(0.0, _hear_cooldown - delta)
 	_hear_grace = max(0.0, _hear_grace - delta)
 
+	# Check if we can see the player (before catching them)
+	var can_see = player and _can_see_player(player)
+	
+	if can_see:
+		last_saw_player_timer = 0.0  # Reset timer when we see them
+		last_player_pos = player.global_position
+		
+		# If we see them and grace period is over, catch them
+		if _hear_grace <= 0.0:
+			Transition.caught_and_restart()
+			return
+	else:
+		# Increment timer when we can't see them
+		if chasing_player:
+			last_saw_player_timer += delta
+
 	if investigating:
 		_process_investigation(delta)
 	else:
@@ -129,14 +152,9 @@ func _physics_process(delta: float) -> void:
 		
 	# Consider "pursuing" when investigating OR briefly after hearing (grace)
 	var pursuing := investigating or (_hear_grace > 0.0)
-	# (If you want heartbeat also when actually seeing the player, add: `or (player and _can_see_player(player))`)
 	_update_heartbeat(pursuing)
 
-
 	_update_animation()
-
-	if _hear_grace <= 0.0 and player and _can_see_player(player):
-		Transition.caught_and_restart()
 
 
 # ----------------------------------------------------------------
@@ -157,7 +175,7 @@ func _process_patrol(delta: float) -> void:
 		waiting = true
 		wait_timer = wait_time
 	else:
-		_move_towards_smooth(agent.get_next_path_position(), delta)
+		_move_towards_smooth(agent.get_next_path_position(), delta, speed)
 
 
 func _next_waypoint() -> void:
@@ -169,35 +187,62 @@ func _next_waypoint() -> void:
 # investigation behaviour
 # ----------------------------------------------------------------
 func _process_investigation(delta: float) -> void:
-	# Update target if chasing player
-	if player and investigating:
+	# If chasing player, continuously update target
+	if chasing_player and player:
+		# Check if we've lost sight for too long
+		if last_saw_player_timer >= chase_timeout:
+			print("⏰ Lost sight of player, investigating last known position")
+			# Switch to investigating last known position
+			chasing_player = false
+			agent.target_position = last_player_pos
+			investigation_timer = 0.0
+			return
+		
+		# Still chasing - update target to current player position
 		agent.target_position = player.global_position
+		_move_towards_smooth(agent.get_next_path_position(), delta, chase_speed)
+		return
 	
+	# Otherwise, investigating a static position (rock/footstep/last known position)
 	if agent.is_navigation_finished():
-		investigating = false
-		print("Investigation done, returning to patrol")
-		if waypoints.size() > 0:
-			agent.target_position = waypoints[current_index]
+		# Reached the noise location, look around for a bit
+		investigation_timer += delta
+		if investigation_timer >= investigation_wait_time:
+			investigating = false
+			chasing_player = false
+			investigation_timer = 0.0
+			last_saw_player_timer = 0.0
+			print("👀 Investigation done, returning to patrol")
+			if waypoints.size() > 0:
+				agent.target_position = waypoints[current_index]
 	else:
-		_move_towards_smooth(agent.get_next_path_position(), delta)
+		_move_towards_smooth(agent.get_next_path_position(), delta, speed)
 
 
-func hear_noise(pos: Vector2) -> void:
+func hear_noise(pos: Vector2, is_player: bool = false) -> void:
 	investigating = true
 	investigate_pos = pos
 	agent.target_position = pos
+	chasing_player = is_player  # Track if this is the player or just a noise
+	investigation_timer = 0.0
+	last_saw_player_timer = 0.0  # Reset the timer when we start investigating
 	_hear_grace = hear_grace_time
-	print("Enemy heard noise at ", pos)
+	
+	if is_player:
+		last_player_pos = pos  # Store last known position
+		print("🔊 Enemy heard PLAYER at ", pos)
+	else:
+		print("🔊 Enemy heard noise at ", pos)
 
 
 # ----------------------------------------------------------------
 # SMOOTH MOVEMENT with turning
 # ----------------------------------------------------------------
-func _move_towards_smooth(target_pos: Vector2, delta: float) -> void:
+func _move_towards_smooth(target_pos: Vector2, delta: float, current_speed: float) -> void:
 	var to_target = target_pos - global_position
 	var distance = to_target.length()
 	
-	if distance < 1.0:
+	if distance < 0.1:
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
@@ -214,7 +259,7 @@ func _move_towards_smooth(target_pos: Vector2, delta: float) -> void:
 	if facing_alignment < deg_to_rad(move_threshold):
 		# Move forward in facing direction
 		var move_dir = Vector2.from_angle(facing_angle)
-		velocity = move_dir * speed
+		velocity = move_dir * current_speed
 	else:
 		# Still turning, slow down or stop
 		velocity = velocity.lerp(Vector2.ZERO, 5.0 * delta)
@@ -297,5 +342,10 @@ func _on_noise_emitted(pos: Vector2, radius: float, loudness: float, priority: i
 	var react_prob = clamp(base_prob * (0.6 + 0.4 * weight), 0.0, 1.0)
 
 	if randf() <= react_prob:
-		hear_noise(pos)
+		# Check if this noise is from the player
+		var is_player_noise = false
+		if player:
+			is_player_noise = player.global_position.distance_to(pos) < 5.0
+		
+		hear_noise(pos, is_player_noise)
 		_hear_cooldown = react_cooldown

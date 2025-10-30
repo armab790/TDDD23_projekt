@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://t3ye84n7kxe6"]
+[gd_scene load_steps=9 format=3 uid="uid://t3ye84n7kxe6"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_dusid"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_7a4n0"]
@@ -7,6 +7,11 @@
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="5_bfsd4"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="6_n71bo"]
 [ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_ye7vx"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_n71bo"]
+vertices = PackedVector2Array(37.9609, -115.117, 37.0313, 115.203, 13, -30, 13, -75.8594, -102.117, -116.867, -75.7813, -77.1406, -103.133, -39.7891, -79.2188, 83, -103, 22.2109, 59.1406, -148, 100.313, -148, 99.3125, -133, 59.8672, -92.7891, 107, -91.7891, 148.867, -133, 147.867, -53, 107, -55.7891, -52.7813, 37, -51.2266, -33.25, -7.36719, -30, 11, 37, 11, 83, -10, 116.211, -56.2109, 117, -103, 117, -150.109, 21.2031, -150.867, -40.7813, 103.109, 118.102, 59, 146, 59, -56.7813, -10, 146, -54.2031, 211.883, 102.102, 210.109, 198, 54.2031, 198, 117.102, 196.203, -53, 197.203, -3, 247.133, -3, 247.859, 53.1875)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 0, 3, 5), PackedInt32Array(6, 4, 5, 7, 8), PackedInt32Array(9, 10, 11, 12), PackedInt32Array(13, 12, 11, 14), PackedInt32Array(13, 14, 15, 16), PackedInt32Array(17, 18, 19, 20), PackedInt32Array(20, 19, 2, 1), PackedInt32Array(21, 20, 1), PackedInt32Array(7, 21, 1, 22, 23, 24), PackedInt32Array(25, 26, 6, 8), PackedInt32Array(24, 8, 7), PackedInt32Array(27, 28, 29, 16, 15), PackedInt32Array(23, 22, 30, 31), PackedInt32Array(32, 31, 30, 28), PackedInt32Array(27, 32, 28), PackedInt32Array(33, 34, 27, 15, 35, 36), PackedInt32Array(33, 36, 37, 38)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-112, -127, 48, -125, 47, 125, 0, 126, 0, 136, 49, 136, 49, -67, 97, -66, 97, -82, 50, -83, 49, -158, 111, -158, 110, -143, 159, -143, 158, -63, 206, -63, 207, -13, 257, -13, 258, 63, 208, 64, 208, 127, 113, 128, 112, 220, -64, 222, -66, 127, -113, 127, -113, 32, -160, 31, -161, -51, -113, -50)])
 
 [node name="Level6" type="Node2D"]
 
@@ -22,9 +27,6 @@ position = Vector2(-136, -20)
 [node name="Player" parent="." instance=ExtResource("3_r6jyi")]
 position = Vector2(-40, -9)
 
-[node name="NPC" parent="." instance=ExtResource("4_bfsd4")]
-position = Vector2(22, -92)
-
 [node name="SpawnPoint" type="Marker2D" parent="." groups=["spawn_point"]]
 position = Vector2(-41, -9)
 
@@ -35,6 +37,7 @@ position = Vector2(233, -3)
 position = Vector2(73, -147)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+visible = false
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="LightScene" parent="." instance=ExtResource("6_n71bo")]
@@ -77,3 +80,52 @@ position = Vector2(135, -136)
 position = Vector2(86, -154)
 
 [node name="ScreenFX" parent="." instance=ExtResource("7_ye7vx")]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+position = Vector2(3, 0)
+navigation_polygon = SubResource("NavigationPolygon_n71bo")
+
+[node name="Polygon2D" type="Polygon2D" parent="NavigationRegion2D"]
+color = Color(1, 1, 1, 0)
+polygon = PackedVector2Array(-7, -40, 3, -40, 3, -66, -66, -67, -69, 73, 1, 73, 1, 47, -63, 47, -61, -44)
+
+[node name="NPC" parent="." instance=ExtResource("4_bfsd4")]
+position = Vector2(-91, 96)
+waypoints_path = NodePath("Waypoints")
+
+[node name="Waypoints" type="Node2D" parent="NPC"]
+
+[node name="Marker2D" type="Marker2D" parent="NPC/Waypoints"]
+
+[node name="Marker2D2" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(3, -85)
+
+[node name="Marker2D3" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(0, -189)
+
+[node name="Marker2D4" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(115, -187)
+
+[node name="Marker2D5" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(115, 8)
+
+[node name="Marker2D6" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(61, 14)
+
+[node name="Marker2D7" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(60, 101)
+
+[node name="Marker2D8" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(175, 104)
+
+[node name="Marker2D9" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(173, 3)
+
+[node name="Marker2D10" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(268, 2)
+
+[node name="Marker2D11" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(266, -109)
+
+[node name="Marker2D12" type="Marker2D" parent="NPC/Waypoints"]
+position = Vector2(172, -107)
