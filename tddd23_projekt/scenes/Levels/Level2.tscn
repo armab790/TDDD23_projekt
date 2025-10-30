@@ -117,3 +117,4 @@ color = Color(1, 1, 1, 0)
 polygon = PackedVector2Array(9, -124, 8, -69, 24, -70, 23, -127)
 
 [node name="ScreenFX" parent="." instance=ExtResource("7_84na2")]
+pulse_color = Color(0.105882, 0, 0, 1)

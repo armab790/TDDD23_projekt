@@ -52,3 +52,6 @@ position = Vector2(183, -40)
 position = Vector2(135, -153)
 
 [node name="ScreenFX" parent="." instance=ExtResource("6_kif8y")]
+
+[node name="ScreenFX2" parent="." instance=ExtResource("6_kif8y")]
+pulse_color = Color(0.105882, 0, 0, 1)

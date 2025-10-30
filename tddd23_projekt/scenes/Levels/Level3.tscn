@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cvpo6g3qyeh4i"]
+[gd_scene load_steps=9 format=3 uid="uid://cvpo6g3qyeh4i"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_85038"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_2fpdq"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="3_w2wn3"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_l4yri"]
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="6_df4ni"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_tdp5f"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_l4yri"]
 vertices = PackedVector2Array(37.9063, -58.8906, 38.8984, 53.8906, 18.1172, 24.2969, 16.8828, -75, 32.3906, -101, -134.102, 52.1016, -16, 26.7422, -29.8281, -193, -29.1797, -156, -58.5938, -156, -85, -193, -85, -60, -60.4297, -112, -37.3828, -60, -34.7969, -112, -16, -75, -134.891, -19.1563, -93, -19.8281, -93, 12, -34.6094, 12, 132.133, -116, 132.859, -59.8906, 78, -101, 78, -116, -33.7734, -124.211, 31.3984, -125.758)
@@ -33,7 +34,6 @@ position = Vector2(105, -115)
 position = Vector2(-117, 23)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="LightScene" parent="." instance=ExtResource("5_l4yri")]
@@ -58,6 +58,7 @@ position = Vector2(-73, -201)
 navigation_polygon = SubResource("NavigationPolygon_l4yri")
 
 [node name="Polygon2D" type="Polygon2D" parent="NavigationRegion2D"]
+color = Color(1, 1, 1, 0)
 polygon = PackedVector2Array(-6, -65, -6, 16, 8, 15, 7, -65)
 
 [node name="NPC" parent="." instance=ExtResource("6_df4ni")]
@@ -83,3 +84,6 @@ position = Vector2(-48, -50)
 
 [node name="Marker2D6" type="Marker2D" parent="NPC/Waypoints"]
 position = Vector2(-50, 8)
+
+[node name="ScreenFX" parent="." instance=ExtResource("7_tdp5f")]
+pulse_color = Color(0.105882, 0, 0, 1)

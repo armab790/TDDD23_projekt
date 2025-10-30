@@ -37,7 +37,6 @@ position = Vector2(233, -3)
 position = Vector2(73, -147)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
 color = Color(0.182423, 0.177929, 0.187587, 1)
 
 [node name="LightScene" parent="." instance=ExtResource("6_n71bo")]
@@ -129,3 +128,6 @@ position = Vector2(266, -109)
 
 [node name="Marker2D12" type="Marker2D" parent="NPC/Waypoints"]
 position = Vector2(172, -107)
+
+[node name="ScreenFX2" parent="." instance=ExtResource("7_ye7vx")]
+pulse_color = Color(0.105882, 0, 0, 1)
