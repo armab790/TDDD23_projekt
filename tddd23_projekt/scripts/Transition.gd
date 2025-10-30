@@ -23,11 +23,8 @@ var _new_scene_player: AudioStreamPlayer
 @export var caught_fade_out: float = 0.25
 @export var caught_sfx: AudioStream                     # optional sound when caught
 
-
 var _card: TextureRect
 var _card_tw: Tween
-
-
 
 # -----------------------------
 # Helpers
@@ -54,8 +51,6 @@ func _play_new_scene_sfx_and_wait() -> void:
 
 	_new_scene_player.stream = new_scene_stream
 	_new_scene_player.play()
-	
-	
 
 	var wait_time = 1.5
 

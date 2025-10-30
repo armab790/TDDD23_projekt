@@ -1,11 +1,11 @@
 extends Node2D
 
 @export var fov_deg: float = 50.0
-@export var view_distance: float = 100.0
+@export var view_distance: float = 80.0
 @export var segments: int = 48
 @export var collision_mask: int = 1
 @export var fill_color: Color = Color(0.2, 0.8, 1.0, 0.15)
-@export var line_color: Color = Color(0.2, 0.8, 1.0, 0.6)
+@export var line_color: Color = Color(0.2, 0.8, 1.0, 0.4)
 
 func _process(_dt: float) -> void:
 	var cb := get_parent() as CharacterBody2D
