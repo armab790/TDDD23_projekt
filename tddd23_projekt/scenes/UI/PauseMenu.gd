@@ -88,15 +88,21 @@ func _on_lobby_pressed() -> void:
 
 # ----- Gameplay detection -----
 func _on_tree_changed() -> void:
-	_update_gameplay_active()
+	# This can fire while we’re not in the tree; defer to next frame.
+	if not is_inside_tree():
+		return
+	call_deferred("_update_gameplay_active")
 
 func _update_gameplay_active() -> void:
-	var scn := get_tree().current_scene
+	if not is_inside_tree():
+		return
+	var tree := get_tree()
+	if tree == null:
+		return
+	var scn := tree.current_scene
 	var was_active := _gameplay_active
 	_gameplay_active = _is_gameplay_scene(scn)
-
-	# If we left gameplay while paused, force resume and hide UI
-	if was_active and not _gameplay_active and get_tree().paused:
+	if was_active and not _gameplay_active and tree.paused:
 		_resume()
 
 func _is_gameplay_scene(scn: Node) -> bool:
