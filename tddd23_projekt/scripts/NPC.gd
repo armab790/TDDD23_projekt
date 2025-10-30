@@ -10,12 +10,12 @@ extends CharacterBody2D
 @onready var agent: NavigationAgent2D = $NavigationAgent2D
 
 # --- Vision ---
-@export var view_distance: float = 100.0
+@export var view_distance: float = 80.0
 @export var fov_deg: float = 50.0
 @export var catch_distance: float = 22.0   # must be within this distance AND in sight to catch
 
 # --- Hearing (probabilistic with distance) ---
-@export var hear_radius_fallback: float = 100.0
+@export var hear_radius_fallback: float = 70.0
 @export var prob_at_edge: float = 0.10     # reaction probability at max radius
 @export var prob_at_center: float = 0.99   # reaction probability at source
 @export var react_cooldown: float = 0.30

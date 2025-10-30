@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 signal noise_emitted(pos: Vector2, radius: float, loudness: float, priority: int)
 
-const SPEED := 100.0
+const SPEED := 65.0
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 
 # NEW: footstep audio + cadence
