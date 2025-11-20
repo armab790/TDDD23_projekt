@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://by6jbexbg0mpy"]
+[gd_scene load_steps=11 format=3 uid="uid://kvx8ojut5ewi"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_6sp58"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_relvm"]
@@ -6,114 +6,99 @@
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="4_qrxlh"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="5_qrxlh"]
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="6_o7egn"]
-[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_84na2"]
+[ext_resource type="Script" uid="uid://c768r878cg6lp" path="res://scenes/Levels/MiniMap.gd" id="8_1igg8"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/Levels/ScreenFX.tscn" id="8_jjnbj"]
+[ext_resource type="PackedScene" uid="uid://c880onl4xyekt" path="res://scenes/Rock.tscn" id="8_xcf1u"]
 
-[sub_resource type="GDScript" id="GDScript_0vwrv"]
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_7orvs"]
+vertices = PackedVector2Array(-21.25, -33.2734, -19.7422, -92, 1.29688, -132.922, 4.3125, -38, -2.17188, -8, -102.773, -132.078, -78.25, -92, -100.203, -16.3984, -76.75, -31.7266, -68.3672, -14.4219, 24.7422, 30.4531, 65.7422, 28.5, 65.2266, 50, -1.17188, 50, 19.7109, -38, -47, -8, -66.5938, 30, -47, 65.8828, -114.172, 65.1094, -114.813, 30)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 2, 1, 6), PackedInt32Array(7, 5, 6, 8), PackedInt32Array(9, 7, 8, 0), PackedInt32Array(10, 11, 12, 13), PackedInt32Array(14, 10, 13, 4, 3), PackedInt32Array(0, 4, 15, 9), PackedInt32Array(16, 9, 15, 17), PackedInt32Array(16, 17, 18, 19)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-113, -142, 11, -143, 14, -48, 29, -48, 34, 20, 76, 18, 75, 60, -11, 60, -12, 2, -37, 2, -37, 76, -124, 75, -125, 20, -77, 20, -78, -5, -110, -7)])
 
-[sub_resource type="NavigationPolygon" id="NavigationPolygon_o7egn"]
-vertices = PackedVector2Array(-1.78125, -32, -2.88281, 18.7813, -13, -13, -13, -82, -2.1875, -58.3438, 93.3828, -112.883, 97.3828, -7.85938, 83, -16, 83, -82, 33.2578, -112.203, 44, -82, 34.1719, -60.6172, 44, -16, -63.8594, 18.1094, -52.2109, -13, -62.1328, -111.109, -50.7969, -82, -1.21875, -111.797, 176.906, -8.99219, 210.781, -8.21875, 210.211, 18.0391, 34, 18.9063, 34, -32)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4), PackedInt32Array(5, 6, 7, 8), PackedInt32Array(9, 5, 8, 10), PackedInt32Array(11, 9, 10, 12), PackedInt32Array(2, 1, 13, 14), PackedInt32Array(14, 13, 15, 16), PackedInt32Array(16, 15, 17, 3), PackedInt32Array(3, 17, 4), PackedInt32Array(18, 19, 20, 21, 6), PackedInt32Array(7, 6, 21, 12), PackedInt32Array(12, 21, 22, 11), PackedInt32Array(4, 11, 22, 0)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-72, -121, 103, -123, 107, -18, 177, -19, 221, -18, 220, 28, 17, 29, -74, 28)])
-
-[node name="Level2" type="Node2D"]
-script = SubResource("GDScript_0vwrv")
-
-[node name="tiles" parent="." instance=ExtResource("1_6sp58")]
-layer_0/tile_data = PackedInt32Array(196601, 196608, 8, 196602, 196608, 8, 196603, 196608, 8, 196604, 196608, 8, 131070, 196608, 8, 131071, 196608, 8, 65538, 196608, 8, 65539, 196608, 8, 65540, 196608, 8, 65541, 196608, 8, 65542, 196608, 8, 65543, 196608, 8, 65544, 196608, 8, 65545, 196608, 8, 65546, 196608, 8, 65547, 196608, 8, 65548, 196608, 8, 65549, 393216, 7, 65536, 393216, 7, 65537, 0, 7, 196600, 0, 7, 65531, 131072, 5, -65538, 131072, 5, -262143, 131072, 5, -131068, 131072, 5, -65525, 131072, 5, -65530, 262144, 5, -131069, 262144, 5, -262144, 262144, 5, -65539, 262144, 5, 65530, 262144, 5, -131080, 0, 3, -65544, 0, 4, -8, 0, 5, -131079, 196608, 2, -65543, 196608, 3, -7, 196608, 4, -131078, 262144, 2, -65542, 262144, 3, -6, 262144, 4, -65541, 458752, 3, -5, 458752, 4, 131064, 0, 6, 65528, 0, 6, -131077, 0, 6, -196613, 0, 6, -262149, 0, 6, -327685, 0, 6, 1, 0, 6, -65535, 0, 6, -262138, 393216, 6, -327674, 393216, 6, -393210, 393216, 6, 13, 393216, 6, -65523, 393216, 6, 0, 393216, 6, -65536, 393216, 6, -196610, 458752, 3, -131074, 458752, 4, -393215, 458752, 3, -327679, 458752, 4, -262140, 458752, 3, -196604, 458752, 4, -262141, 524288, 3, -196605, 524288, 4, -393216, 524288, 3, -327680, 524288, 4, -196611, 524288, 3, -131075, 524288, 4, -524293, 0, 3, -458757, 0, 4, -393221, 0, 5, -262133, 131072, 2, -196597, 131072, 3, -131061, 131072, 4, -196595, 524288, 1, -131059, 524288, 2, -262131, 262144, 2, -262132, 196608, 2, -196596, 196608, 3, -131060, 196608, 4, -196598, 196608, 2, -131062, 196608, 3, -65526, 196608, 4, -196599, 196608, 2, -131063, 196608, 3, -65527, 196608, 4, -196600, 196608, 2, -131064, 196608, 3, -65528, 196608, 4, -196601, 196608, 2, -131065, 196608, 3, -65529, 196608, 4, -589819, 196608, 2, -524283, 196608, 3, -458747, 196608, 4, -589820, 196608, 2, -524284, 196608, 3, -458748, 196608, 4, -589821, 196608, 2, -524285, 196608, 3, -458749, 196608, 4, -589822, 196608, 2, -524286, 196608, 3, -458750, 196608, 4, -524289, 196608, 2, -458753, 196608, 3, -393217, 196608, 4, -524290, 196608, 2, -458754, 196608, 3, -393218, 196608, 4, -524291, 196608, 2, -458755, 196608, 3, -393219, 196608, 4, -524292, 196608, 2, -458756, 196608, 3, -393220, 196608, 4, -589824, 393216, 3, -524288, 393216, 4, -458752, 393216, 5, -589823, 0, 3, -524287, 0, 4, -458751, 0, 5, -131072, 262144, 7, -131071, 131072, 7, -327676, 131072, 7, -262146, 131072, 7, -262147, 262144, 7, -327677, 262144, 7, -589818, 393216, 3, -524282, 393216, 4, -458746, 393216, 5, -196602, 524288, 3, -131066, 524288, 4, 131069, 262144, 7, 196605, 262144, 8, 131066, 65536, 6, -1, 65536, 6, -327678, 65536, 6, 8, 65536, 6, 10, 131072, 6, 3, 131072, 6, -196609, 131072, 6, -196612, 131072, 6, 131067, 131072, 6, 131068, 196608, 6, -131076, 196608, 6, -262145, 196608, 6, -65532, 196608, 6, 11, 196608, 6, -393211, 196608, 6, -65533, 196608, 7, 65532, 196608, 7, -65524, 196608, 7, 5, 262144, 6, -196606, 262144, 6, -3, 262144, 6, 131065, 262144, 6, 65529, 196608, 5, -65540, 196608, 5, -4, 196608, 5, 65533, 196608, 5, 65534, 196608, 5, 65535, 196608, 5, -2, 196608, 5, -65537, 196608, 5, -131073, 196608, 5, -196608, 196608, 5, -196607, 196608, 5, -262142, 196608, 5, -131070, 196608, 5, -65534, 196608, 5, 2, 196608, 5, 4, 196608, 5, -65531, 196608, 5, -131067, 196608, 5, -196603, 196608, 5, -262139, 196608, 5, -327675, 196608, 5, -393212, 196608, 5, -393213, 196608, 5, -393214, 196608, 5, -327681, 196608, 5, -327682, 196608, 5, -327683, 196608, 5, -327684, 196608, 5, -262148, 196608, 5, 6, 196608, 5, 7, 196608, 5, 9, 196608, 5, 12, 196608, 5)
-
-[node name="things" parent="." instance=ExtResource("1_6sp58")]
-layer_0/tile_data = PackedInt32Array(-458756, 524288, 5, -458753, 524288, 5, -524286, 524288, 5, -524283, 524288, 5, -131065, 524288, 5, -131062, 524288, 5, -65543, 524288, 5, -393220, 524288, 9, -65529, 524288, 9, -131064, 458752, 8, -65528, 458752, 9, -65527, 393216, 9, 65535, 393216, 9, -458747, 393216, 9)
-
-[node name="Door" parent="." instance=ExtResource("2_relvm")]
-position = Vector2(200, -20)
-
-[node name="Lever" parent="." groups=["levers"] instance=ExtResource("4_qrxlh")]
-position = Vector2(-23, -113)
-
-[node name="Player" parent="." instance=ExtResource("4_aotjr")]
-position = Vector2(-104, 6)
-
-[node name="SpawnPoint" type="Marker2D" parent="." groups=["spawn_point"]]
-position = Vector2(-105, 2)
-
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-position = Vector2(-40, -58)
-color = Color(0.182423, 0.177929, 0.187587, 1)
-
-[node name="LightScene" parent="." instance=ExtResource("5_qrxlh")]
-position = Vector2(-57, -121)
-
-[node name="LightScene2" parent="." instance=ExtResource("5_qrxlh")]
-position = Vector2(-9, -120)
-
-[node name="LightScene3" parent="." instance=ExtResource("5_qrxlh")]
-position = Vector2(39, -121)
-
-[node name="LightScene4" parent="." instance=ExtResource("5_qrxlh")]
-position = Vector2(87, -120)
-
-[node name="LightScene5" parent="." instance=ExtResource("5_qrxlh")]
-position = Vector2(119, -25)
-
-[node name="LightScene6" parent="." instance=ExtResource("5_qrxlh")]
-position = Vector2(167, -25)
-
-[node name="LightScene7" parent="." instance=ExtResource("5_qrxlh")]
-position = Vector2(-105, -25)
+[node name="Level1" type="Node2D"]
 
 [node name="NPC" parent="." instance=ExtResource("6_o7egn")]
-position = Vector2(88, -4)
+position = Vector2(-8, -38)
 waypoints_path = NodePath("Waypoints")
 
 [node name="Waypoints" type="Node2D" parent="NPC"]
 
 [node name="Marker2D" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(1, -10)
+position = Vector2(0, -32)
 
 [node name="Marker2D2" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(1, -52)
+position = Vector2(5, -73)
 
 [node name="Marker2D3" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-1, -91)
+position = Vector2(-31, -73)
 
 [node name="Marker2D4" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-48, -90)
+position = Vector2(-76, -71)
 
 [node name="Marker2D5" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-48, -35)
+position = Vector2(-81, -35)
 
 [node name="Marker2D6" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-93, -35)
+position = Vector2(-80, 10)
 
 [node name="Marker2D7" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-96, -84)
+position = Vector2(-39, 12)
 
 [node name="Marker2D8" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-144, -84)
+position = Vector2(3, 11)
 
-[node name="Marker2D9" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-143, 9)
+[node name="tiles" parent="." instance=ExtResource("1_6sp58")]
+layer_0/tile_data = PackedInt32Array(327677, 393216, 7, 262141, 393216, 6, 196605, 393216, 6, 131069, 393216, 6, 65533, 393216, 6, -3, 262144, 7, -2, 196608, 8, -1, 131072, 7, 65535, 0, 6, 131071, 0, 6, 196607, 0, 6, 262143, 0, 7, 196608, 196608, 8, 196609, 196608, 8, 196610, 196608, 8, 196611, 196608, 8, 196612, 393216, 7, 131076, 393216, 6, 65540, 393216, 6, -65535, 524288, 3, 1, 524288, 4, -65534, 131072, 3, 2, 131072, 4, 65537, 262144, 5, 65538, 131072, 5, -131070, 131072, 2, -131069, 196608, 2, -65533, 196608, 3, 3, 196608, 4, -65532, 524288, 1, 4, 524288, 2, -131068, 262144, 2, -131071, 393216, 6, -262143, 524288, 1, -196607, 524288, 2, -327679, 262144, 2, -327680, 524288, 3, -262144, 524288, 4, -196608, 262144, 5, -393216, 393216, 6, -458752, 393216, 6, -524288, 524288, 2, -589824, 524288, 1, -655360, 262144, 2, -589825, 196608, 2, -524289, 196608, 3, -458753, 196608, 4, -589826, 196608, 2, -524290, 196608, 3, -458754, 196608, 4, -589827, 196608, 2, -524291, 196608, 3, -458755, 196608, 4, -589828, 196608, 2, -524292, 196608, 3, -458756, 196608, 4, -589829, 196608, 2, -524293, 196608, 3, -458757, 196608, 4, -589830, 196608, 2, -524294, 196608, 3, -458758, 196608, 4, -589831, 0, 3, -524295, 0, 4, -458759, 0, 5, -393223, 0, 6, -327687, 0, 6, -262151, 0, 6, -196615, 0, 6, -131079, 0, 6, -65543, 0, 6, -7, 0, 7, -6, 196608, 8, -5, 131072, 7, 65531, 458752, 3, 131067, 458752, 4, 196603, 131072, 5, 65530, 196608, 2, 131066, 196608, 3, 196602, 196608, 4, 65529, 196608, 2, 131065, 196608, 3, 196601, 196608, 4, 65528, 0, 3, 131064, 0, 4, 196600, 0, 5, 262136, 0, 6, -262148, 196608, 2, -196612, 196608, 3, -131076, 196608, 4, -262147, 196608, 2, -196611, 196608, 3, -131075, 196608, 4, -262149, 524288, 3, -196613, 524288, 4, -262146, 458752, 3, -196610, 458752, 4, -131074, 131072, 5, -131077, 262144, 5, -327682, 131072, 7, -327685, 262144, 7, -327684, 196608, 8, -327683, 196608, 8, 327672, 0, 7, 327673, 196608, 8, 327674, 196608, 8, 327675, 196608, 8, 327676, 196608, 8, 262137, 131072, 6, -4, 131072, 6, -327681, 131072, 6, 131073, 131072, 6, 131074, 196608, 6, 65532, 196608, 6, -131078, 196608, 6, -393221, 196608, 6, -327686, 262144, 6, -65537, 262144, 6, 131075, 262144, 6, 262140, 262144, 6, 131068, 65536, 6, -196614, 65536, 6, -393217, 65536, 6, -131072, 65536, 6, 262138, 196608, 5, 262139, 196608, 5, 196604, 196608, 5, -65542, 196608, 5, -65541, 196608, 5, -65540, 196608, 5, -65539, 196608, 5, -65538, 196608, 5, -131073, 196608, 5, -196609, 196608, 5, -262145, 196608, 5, -262150, 196608, 5, -393222, 196608, 5, -393220, 196608, 5, -393219, 196608, 5, -393218, 196608, 5, -65536, 196608, 5, 0, 196608, 5, 65536, 196608, 5, 131072, 196608, 5, 65539, 196608, 5)
 
-[node name="Marker2D10" type="Marker2D" parent="NPC/Waypoints"]
-position = Vector2(-94, 7)
+[node name="things" parent="." instance=ExtResource("1_6sp58")]
+layer_0/tile_data = PackedInt32Array(-196611, 524288, 5, -524289, 524288, 5, -524294, 524288, 5, 131066, 524288, 5, -458753, 589824, 9, -524293, 458752, 8, -458757, 458752, 9, -458756, 524288, 9, -458758, 524288, 9)
+
+[node name="Door" parent="." instance=ExtResource("2_relvm")]
+position = Vector2(56, 12)
+
+[node name="Player" parent="." instance=ExtResource("4_aotjr")]
+position = Vector2(-106, 59)
+
+[node name="SpawnPoint" type="Marker2D" parent="." groups=["spawn_point"]]
+position = Vector2(-105, 58)
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.182423, 0.177929, 0.187587, 1)
+
+[node name="LightScene" parent="." instance=ExtResource("5_qrxlh")]
+position = Vector2(-41, -57)
+
+[node name="LightScene2" parent="." instance=ExtResource("5_qrxlh")]
+position = Vector2(-89, 24)
+
+[node name="LightScene3" parent="." instance=ExtResource("5_qrxlh")]
+position = Vector2(-89, -137)
+
+[node name="LightScene4" parent="." instance=ExtResource("5_qrxlh")]
+position = Vector2(-9, -137)
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
-navigation_polygon = SubResource("NavigationPolygon_o7egn")
+navigation_polygon = SubResource("NavigationPolygon_7orvs")
 
 [node name="Polygon2D" type="Polygon2D" parent="NavigationRegion2D"]
 color = Color(1, 1, 1, 0)
-polygon = PackedVector2Array(54, -26, 73, -26, 73, -72, 54, -72)
+polygon = PackedVector2Array(-67, -42, -31, -43, -30, -82, -68, -82)
 
-[node name="Polygon2D2" type="Polygon2D" parent="NavigationRegion2D"]
-color = Color(1, 1, 1, 0)
-polygon = PackedVector2Array(-41, -72, -42, -23, -23, -23, -23, -73)
+[node name="Rock" parent="." instance=ExtResource("8_xcf1u")]
+position = Vector2(-77, 54)
 
-[node name="Polygon2D3" type="Polygon2D" parent="NavigationRegion2D"]
-color = Color(1, 1, 1, 0)
-polygon = PackedVector2Array(8, -22, 7, 24, 24, 24, 24, -23)
+[node name="Lever" parent="." instance=ExtResource("4_qrxlh")]
+position = Vector2(-78, 27)
 
-[node name="Polygon2D4" type="Polygon2D" parent="NavigationRegion2D"]
-color = Color(1, 1, 1, 0)
-polygon = PackedVector2Array(9, -124, 8, -69, 24, -70, 23, -127)
+[node name="ScreenFX" parent="." instance=ExtResource("8_jjnbj")]
+pulse_color = Color(0.10781, 0, 0.000399032, 1)
 
-[node name="ScreenFX" parent="." instance=ExtResource("7_84na2")]
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MiniMap" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(7, 7)
+script = ExtResource("8_1igg8")

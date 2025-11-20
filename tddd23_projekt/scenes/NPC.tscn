@@ -128,6 +128,8 @@ animations = [{
 
 [node name="NPC" type="CharacterBody2D"]
 z_index = 1
+collision_layer = 12
+collision_mask = 3
 script = ExtResource("1_jiysx")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -156,6 +158,28 @@ blackboard_plan = SubResource("BlackboardPlan_4cv6p")
 path_desired_distance = 10.0
 path_postprocessing = 1
 avoidance_enabled = true
+radius = 6.89
+neighbor_distance = 32.0
+max_neighbors = 8
+avoidance_layers = 9
 
 [node name="Heartbeat" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("16_4cv6p")
+
+[node name="SpeechLabel" type="Label" parent="."]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -39.0
+offset_top = -32.0
+offset_right = 157.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.4, 0.4)
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2

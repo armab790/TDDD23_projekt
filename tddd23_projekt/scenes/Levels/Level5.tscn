@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://b18rd0s7an0cl"]
+[gd_scene load_steps=10 format=3 uid="uid://b18rd0s7an0cl"]
 
 [ext_resource type="PackedScene" uid="uid://cv5i22bg8yb6a" path="res://scenes/player.tscn" id="1_kul1s"]
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_lsa2l"]
@@ -6,7 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="4_nrbuy"]
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="5_nrbuy"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="6_emect"]
-[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_1ignd"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/Levels/ScreenFX.tscn" id="7_1ignd"]
+[ext_resource type="Script" uid="uid://c768r878cg6lp" path="res://scenes/Levels/MiniMap.gd" id="8_e7425"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_emect"]
 vertices = PackedVector2Array(22.8672, 4.24219, -37.6563, 5.72656, -36.3203, -36, -9.53906, -36, 21.8672, -73.7891, -7.42969, -74, 200.727, -183.289, 245.922, -184.68, 245.07, -73.9063, 199.727, -147.047, -220.539, -144.938, 134, -72.9063, 90, -75.2109, 134, -26.6875, 90, -25.3203, -75.2188, -74, -74.2109, -26.8438, -119, -26.1484, -119, -72.9297, -263, -73.9297, -263, -242, -216.672, -172.031, 117.93, -171.031, -183.188, -242, -136.82, -240, -182.18, -295.148, -137.82, -295.844, 71.5391, -240, 117.063, -301.32, 74.5234, -302.688)
@@ -101,3 +102,13 @@ position = Vector2(-332, 101)
 position = Vector2(124, 102)
 
 [node name="ScreenFX2" parent="." instance=ExtResource("7_1ignd")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MiniMap" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(7, 7)
+script = ExtResource("8_e7425")

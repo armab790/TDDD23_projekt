@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://t3ye84n7kxe6"]
+[gd_scene load_steps=10 format=3 uid="uid://t3ye84n7kxe6"]
 
 [ext_resource type="PackedScene" uid="uid://de7j07r5b1iif" path="res://scenes/Levels/tiles.tscn" id="1_dusid"]
 [ext_resource type="PackedScene" uid="uid://d0ltvxvi830p6" path="res://scenes/door.tscn" id="2_7a4n0"]
@@ -6,7 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://bi51sinak2u" path="res://scenes/NPC.tscn" id="4_bfsd4"]
 [ext_resource type="PackedScene" uid="uid://byyoyic6uyubu" path="res://scenes/Lever.tscn" id="5_bfsd4"]
 [ext_resource type="PackedScene" uid="uid://b5tqw58h0ujc6" path="res://scenes/FlickeringLight2D.tscn" id="6_n71bo"]
-[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/ScreenFX.tscn" id="7_ye7vx"]
+[ext_resource type="PackedScene" uid="uid://dewr2pt3qix8k" path="res://scenes/Levels/ScreenFX.tscn" id="7_ye7vx"]
+[ext_resource type="Script" uid="uid://c768r878cg6lp" path="res://scenes/Levels/MiniMap.gd" id="8_2vgsm"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_n71bo"]
 vertices = PackedVector2Array(150.203, 6, 197.203, -3, 247.133, -3, 247.859, 53.1875, 198, 54.2031, 37.9609, -115.117, 37.0313, 115.203, 13, -30, 13, -75.8594, -102.117, -116.867, -75.7813, -77.1406, -103.133, -39.7891, -79.2188, 83, -103, 22.2109, 148.813, 77, 198, 117.102, 103.109, 118.102, 97, 77, 59.1406, -148, 100.313, -148, 99.3125, -133, 59.8672, -92.7891, 107, -91.7891, 148.867, -133, 147.867, -53, 107, -55.7891, -52.7813, 37, -51.2266, -33.25, -7.36719, -30, 11, 37, 11, 83, -10, 116.211, -56.2109, 117, -103, 117, -150.109, 21.2031, -150.867, -40.7813, 59, 146, 59, -56.7813, 97, 6, -10, 146, -54.2031, 211.883, 102.102, 210.109, 196.203, -53)
@@ -134,3 +135,13 @@ position = Vector2(266, -109)
 position = Vector2(172, -107)
 
 [node name="ScreenFX2" parent="." instance=ExtResource("7_ye7vx")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MiniMap" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(7, 7)
+script = ExtResource("8_2vgsm")

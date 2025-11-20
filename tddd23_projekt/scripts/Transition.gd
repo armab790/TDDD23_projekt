@@ -318,3 +318,11 @@ func return_to_menu(menu_path: String, msg: String = "", fade: float = 0.8) -> v
 	if _card.visible:
 		await _hide_card()
 	await fade_from_black(fade)
+
+func is_overlay_active() -> bool:
+	# Returns true whenever a fade/card/transition screen is visible.
+	if shade and shade.modulate.a > 0.01:
+		return true
+	if _card and _card.visible:
+		return true
+	return false

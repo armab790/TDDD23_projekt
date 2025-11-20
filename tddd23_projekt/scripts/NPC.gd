@@ -4,18 +4,18 @@ extends CharacterBody2D
 @export var speed: float = 40.0
 @export var chase_speed: float = 40.0
 @export var wait_time: float = 0.0
-@export var investigation_wait_time: float = 2.0
-@export var chase_timeout: float = 5.0
+@export var investigation_wait_time: float = 8.0
+@export var chase_timeout: float = 15.0
 @export var waypoints_path: NodePath
 @onready var agent: NavigationAgent2D = $NavigationAgent2D
 
 # --- Vision ---
-@export var view_distance: float = 80.0
+@export var view_distance: float = 50.0
 @export var fov_deg: float = 50.0
-@export var catch_distance: float = 22.0   # must be within this distance AND in sight to catch
+@export var catch_distance: float = 20.0   # must be within this distance AND in sight to catch
 
 # --- Hearing (probabilistic with distance) ---
-@export var hear_radius_fallback: float = 70.0
+@export var hear_radius_fallback: float = 50.0
 @export var prob_at_edge: float = 0.10     # reaction probability at max radius
 @export var prob_at_center: float = 0.99   # reaction probability at source
 @export var react_cooldown: float = 0.30
@@ -26,6 +26,54 @@ extends CharacterBody2D
 @export var move_threshold: float = 5.0
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 @onready var player: CharacterBody2D = get_node_or_null("../Player")
+
+# --- Look-around at waypoints ---
+@export var look_around_enabled: bool = true
+@export var look_around_angle_deg: float = 35.0    # how far left/right to turn
+
+var _look_around_phase: float = 0.0
+var _look_around_base_angle: float = 0.0
+
+# >>> Simple speech/bark settings
+@export var bark_cooldown: float = 1.5              # min seconds between barks
+@export var patrol_bark_interval: float = 12.0      # seconds between idle patrol barks
+@export var speech_visible_time: float = 2.5        # how long a line stays visible
+@export var speech_label_path: NodePath
+
+var _bark_cooldown_timer: float = 0.0
+var _patrol_bark_timer: float = 0.0
+var _speech_timer: float = 0.0
+@onready var speech_label: Label = get_node_or_null(speech_label_path)
+
+# Remember last line to avoid immediate repeats
+var _last_bark_text: String = ""
+
+# --- Suspicion system (now mostly flavour) ---
+@export var suspicion_build_rate: float = 1.2
+@export var suspicion_decay_rate: float = 0.3
+@export var suspicion_threshold: float = 1.0
+@export var suspicion_min_to_investigate: float = 0.4
+var _suspicion: float = 0.0
+
+# --- Search pattern after losing player ---
+@export var search_radius: float = 32.0
+@export var search_points_count: int = 4
+@export var max_search_time: float = 17.0
+
+var _search_points: Array[Vector2] = []
+var _search_index: int = -1
+var _search_time: float = 0.0
+
+# --- Stuck detection ---
+@export var stuck_distance_threshold: float = 3.0
+@export var stuck_time_threshold: float = 3.0
+var _stuck_timer: float = 0.0
+var _last_pos: Vector2 = Vector2.ZERO
+
+# --- Guard smalltalk ---
+@export var guard_chat_distance: float = 26.0
+@export var guard_chat_cooldown: float = 9.0
+var _guard_chat_timer: float = 0.0
 
 # --- State ---
 var waypoints: Array[Vector2] = []
@@ -69,10 +117,20 @@ func _get_screen_fx() -> Node:
 		return _fx_cached
 	_fx_cached = get_tree().get_first_node_in_group("screen_fx")
 	return _fx_cached
-	
+
 func refresh_alert_fx() -> void:
 	var pursuing := chasing_player or (investigating and investigating_player)
 	_update_heartbeat(pursuing, true)
+
+func _find_player() -> void:
+	if player and is_instance_valid(player):
+		return
+
+	# Find first node in group "player" (works even if hierarchy changes)
+	var p := get_tree().get_first_node_in_group("player")
+	if p and p is CharacterBody2D:
+		player = p
+
 
 # -----------------------------
 # Heartbeat & pulse
@@ -103,6 +161,25 @@ func _update_heartbeat(active: bool, force: bool = false) -> void:
 			fx.stop_pulse()
 
 # -----------------------------
+# Sound line-of-sight helper
+# -----------------------------
+func _has_clear_sound_path(pos: Vector2) -> bool:
+	var space := get_world_2d().direct_space_state
+	var query := PhysicsRayQueryParameters2D.create(global_position, pos)
+	query.exclude = [self]
+
+	var hit := space.intersect_ray(query)
+	if hit.is_empty():
+		return true
+
+	var collider = hit["collider"]
+	if collider == player:
+		return true
+
+	# Anything else in between (walls, props) blocks the sound
+	return false
+
+# -----------------------------
 # Ready
 # -----------------------------
 func _ready() -> void:
@@ -110,6 +187,7 @@ func _ready() -> void:
 	randomize()
 	last_dir = Vector2.DOWN
 	facing_angle = last_dir.angle()
+	_last_pos = global_position
 
 	# Heartbeat audio (create if missing)
 	if heartbeat == null:
@@ -124,78 +202,478 @@ func _ready() -> void:
 	if heartbeat.stream and heartbeat.stream.has_method("set_loop"):
 		heartbeat.stream.set_loop(true)
 
-	# collect waypoints
-	if waypoints_path != NodePath():
-		var container = get_node_or_null(waypoints_path)
-		if container:
-			for c in container.get_children():
-				if c is Node2D:
-					waypoints.append(c.global_position)
-
-	if waypoints.size() > 0:
-		current_index = 0
-		agent.target_position = waypoints[0]
-	else:
-		print("NPC has no waypoints!")
+	_init_waypoints()
 
 	# connect PLAYER noise to a dedicated handler
 	if player and player.has_signal("noise_emitted"):
 		player.connect("noise_emitted", Callable(self, "_on_player_noise"))
 
+	# Resolve speech label (either via path or by name)
+	if speech_label_path != NodePath():
+		speech_label = get_node_or_null(speech_label_path)
+	else:
+		speech_label = get_node_or_null("SpeechLabel")
+
+	if speech_label:
+		speech_label.text = ""
+		
+		_init_waypoints()
+
+	# Find player in a robust way
+	_find_player()
+
+	# connect PLAYER noise to a dedicated handler
+	if player and player.has_signal("noise_emitted"):
+		if not player.is_connected("noise_emitted", Callable(self, "_on_player_noise")):
+			player.connect("noise_emitted", Callable(self, "_on_player_noise"))
+
+	# Resolve speech label (either via path or by name)
+	if speech_label_path != NodePath():
+		speech_label = get_node_or_null(speech_label_path)
+	else:
+		speech_label = get_node_or_null("SpeechLabel")
+
+	if speech_label:
+		speech_label.text = ""
+
+
+	_patrol_bark_timer = patrol_bark_interval
+
+# -----------------------------
+# Waypoint init (robust)
+# -----------------------------
+func _init_waypoints() -> void:
+	waypoints.clear()
+	var container: Node = null
+
+	if waypoints_path != NodePath():
+		container = get_node_or_null(waypoints_path)
+	else:
+		if get_parent():
+			container = get_parent().get_node_or_null("Waypoints")
+		if container == null:
+			container = get_node_or_null("Waypoints")
+
+	if container:
+		for c in container.get_children():
+			if c is Node2D:
+				waypoints.append(c.global_position)
+
+	if waypoints.size() > 0:
+		current_index = 0
+		agent.target_position = waypoints[0]
+	else:
+		push_warning("%s has no waypoints (set 'waypoints_path' or add 'Waypoints' node)" % name)
+
+# -----------------------------
+# Behavior Tree helpers
+# -----------------------------
+func _reset_to_patrol() -> void:
+	investigating = false
+	investigating_player = false
+	chasing_player = false
+	investigation_timer = 0.0
+	last_saw_player_timer = 0.0
+	_suspicion = 0.0
+	_search_points.clear()
+	_search_index = -1
+	_search_time = 0.0
+	_stuck_timer = 0.0
+
+	if waypoints.size() > 0:
+		agent.target_position = waypoints[current_index]
+
+	refresh_alert_fx()
+
+# -----------------------------
+# Simple bark / speech helpers
+# -----------------------------
+func _say_line(text: String) -> void:
+	if _bark_cooldown_timer > 0.0:
+		return
+	_bark_cooldown_timer = bark_cooldown
+	_speech_timer = speech_visible_time
+	_last_bark_text = text
+
+	if speech_label:
+		speech_label.text = text
+	else:
+		print("[NPC]: ", text)
+
+func _say_random(lines: Array[String]) -> void:
+	if lines.is_empty():
+		return
+	if lines.size() == 1:
+		_say_line(lines[0])
+		return
+
+	var chosen: String = lines[randi() % lines.size()]
+	var attempts := 0
+	while chosen == _last_bark_text and attempts < 4:
+		chosen = lines[randi() % lines.size()]
+		attempts += 1
+
+	_say_line(chosen)
+
+# -----------------------------
+# Guard alert broadcast
+# -----------------------------
+func _broadcast_alert(pos: Vector2) -> void:
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if e == self:
+			continue
+		if e.has_method("on_alert_from_guard"):
+			e.on_alert_from_guard(pos)
+
+func on_alert_from_guard(pos: Vector2) -> void:
+	if chasing_player:
+		return
+
+	investigating = true
+	investigating_player = true
+	investigate_pos = pos
+	agent.target_position = pos
+	investigation_timer = 0.0
+
+	_say_random([
+		"What's going on over there?",
+		"He found something!",
+		"I'm on my way.",
+		"Trouble? Moving to assist."
+	])
+
+# -----------------------------
+# STUCK DETECTION
+# -----------------------------
+func _update_stuck(delta: float) -> void:
+	if agent == null:
+		_last_pos = global_position
+		_stuck_timer = 0.0
+		return
+
+	var moved := global_position.distance_to(_last_pos)
+	var dist_to_target := global_position.distance_to(agent.target_position)
+
+	var intentionally_idle := waiting \
+		or (investigating and (agent.is_navigation_finished() or dist_to_target <= 4.0))
+
+	if intentionally_idle:
+		_stuck_timer = 0.0
+		_last_pos = global_position
+		return
+
+	var should_be_moving := chasing_player or (investigating and dist_to_target > 4.0)
+
+	if should_be_moving and moved < stuck_distance_threshold:
+		_stuck_timer += delta
+		if _stuck_timer >= stuck_time_threshold:
+			print("NPC stuck, resetting to patrol")
+			_reset_to_patrol()
+	else:
+		_stuck_timer = 0.0
+
+	_last_pos = global_position
+
+# -----------------------------
+# Guard smalltalk
+# -----------------------------
+func _update_guard_smalltalk() -> void:
+	if _guard_chat_timer > 0.0:
+		return
+	if chasing_player or investigating:
+		return
+
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if e == self:
+			continue
+		if not (e is Node2D):
+			continue
+
+		var dist := global_position.distance_to(e.global_position)
+		if dist <= guard_chat_distance:
+			_say_random([
+				"You see anything?",
+				"All quiet on your side?",
+				"Same patrol, different night.",
+				"Stay sharp, they could be anywhere.",
+				"I'm freezing. You?",
+				"If you see something, shout.",
+				"Don't fall asleep on me.",
+				"Switch with me later?",
+				"Nothing on this side.",
+				"Keep your eyes open."
+			])
+			_guard_chat_timer = guard_chat_cooldown
+			break
+
 # -----------------------------
 # Physics
 # -----------------------------
 func _physics_process(delta: float) -> void:
-	_hear_cooldown = max(0.0, _hear_cooldown - delta)
-	_hear_grace = max(0.0, _hear_grace - delta)
+	_find_player()
+	
+	_hear_cooldown = maxf(0.0, _hear_cooldown - delta)
+	_hear_grace = maxf(0.0, _hear_grace - delta)
+	_bark_cooldown_timer = maxf(0.0, _bark_cooldown_timer - delta)
+	_patrol_bark_timer = maxf(0.0, _patrol_bark_timer - delta)
+	_guard_chat_timer = maxf(0.0, _guard_chat_timer - delta)
 
-	var can_see := player and _can_see_player(player)
-	var dist_ok := false
-	if player:
-		dist_ok = global_position.distance_to(player.global_position) <= catch_distance
+	# suspicion decays over time (now mostly flavour)
+	_suspicion = maxf(0.0, _suspicion - suspicion_decay_rate * delta)
 
-	if can_see:
-		# Lock onto player but only catch if close enough
-		chasing_player = true
-		last_saw_player_timer = 0.0
-		last_player_pos = player.global_position
+	if _speech_timer > 0.0:
+		_speech_timer -= delta
+		if _speech_timer <= 0.0 and speech_label:
+			speech_label.text = ""
 
-		# Catch only when within distance AND grace expired
-		if dist_ok and _hear_grace <= 0.0:
-			Transition.caught_and_restart()
-			return
-	else:
-		if chasing_player:
-			last_saw_player_timer += delta
+	_run_behavior_tree(delta)
+	_update_stuck(delta)
 
-	if investigating:
-		_process_investigation(delta)
-	else:
-		_process_patrol(delta)
+	# Patrol muttering
+	if not chasing_player and not investigating and _patrol_bark_timer <= 0.0:
+		_say_random([
+			"Hmm… quiet.",
+			"Another boring patrol.",
+			"…Did I hear something?",
+			"Stay sharp.",
+			"Same route, same shadows.",
+			"Nothing ever happens down here.",
+			"If they catch me slacking, I'm done.",
+			"I hate this shift.",
+			"Feels like someone's watching me.",
+			"Why is it always so cold here?",
+			"Focus… just keep moving.",
+			"One more round and I'm done."
+		])
+		_patrol_bark_timer = patrol_bark_interval + randf_range(-4.0, 4.0)
 
-	# Heartbeat/pulse ONLY for the player (chase or player-investigation)
+	if not chasing_player and not investigating:
+		_update_guard_smalltalk()
+
 	var pursuing := chasing_player or (investigating and investigating_player)
 	_update_heartbeat(pursuing)
-
 	_update_animation()
 
 # -----------------------------
-# Patrol
+# Root: Chase -> Investigate -> Patrol
 # -----------------------------
-func _process_patrol(delta: float) -> void:
+func _run_behavior_tree(delta: float) -> void:
+	if _bt_chase(delta):
+		return
+	if _bt_investigate(delta):
+		return
+	_bt_patrol(delta)
+
+# -----------------------------
+# BT: Chase (simplified, reliable)
+# -----------------------------
+func _bt_chase(delta: float) -> bool:
+	# Make sure we have a valid player reference
+	_find_player()
+	if not player or not is_instance_valid(player):
+		chasing_player = false
+		return false
+
+	var can_see := _can_see_player(player)
+	var dist_to_player: float = global_position.distance_to(player.global_position)
+	var dist_ok := dist_to_player <= catch_distance
+
+	# If we have line of sight to the player → full chase
+	if can_see:
+		last_player_pos = player.global_position
+		last_saw_player_timer = 0.0
+		_suspicion = suspicion_threshold  # treat as fully alerted when seen
+
+		# Enter chase state if not already
+		if not chasing_player:
+			chasing_player = true
+			investigating = false
+			investigating_player = true
+			investigation_timer = 0.0
+
+			_broadcast_alert(player.global_position)
+
+			_say_random([
+				"There you are!",
+				"I see you!",
+				"Got you now!",
+				"Hey! Stop right there!",
+				"You really thought you could sneak past me?",
+				"Got eyes on the target!",
+				"Found you!",
+				"You shouldn't be here!",
+				"There! Over there!",
+				"I knew it!"
+			])
+
+		# If close enough, catch immediately
+		if dist_ok and _hear_grace <= 0.0:
+			Transition.caught_and_restart()
+			return true
+
+		# Otherwise, move directly toward the player
+		agent.target_position = player.global_position
+		_move_towards_smooth(agent.get_next_path_position(), delta, chase_speed)
+		return true
+
+	# If we *don’t* currently see the player but were chasing,
+	# move toward last known position for a while
+	if chasing_player:
+		last_saw_player_timer += delta
+
+		if last_saw_player_timer < chase_timeout:
+			agent.target_position = last_player_pos
+			_move_towards_smooth(agent.get_next_path_position(), delta, chase_speed)
+			return true
+		else:
+			# Timed out: switch into search around last known position
+			print("Lost sight of player, starting search around last known position")
+			chasing_player = false
+			last_saw_player_timer = 0.0
+
+			investigating = true
+			investigating_player = true
+			investigate_pos = last_player_pos
+			investigation_timer = 0.0
+
+			_search_points.clear()
+			_search_index = -1
+			_search_time = 0.0
+
+			if search_points_count > 0 and search_radius > 4.0:
+				for i in search_points_count:
+					var angle := TAU * float(i) / float(search_points_count)
+					var offset := Vector2.RIGHT.rotated(angle) * search_radius
+					_search_points.append(last_player_pos + offset)
+
+			agent.target_position = last_player_pos
+
+			_say_random([
+				"Where did you go?",
+				"You can't hide forever.",
+				"I know you're here somewhere…",
+				"Come out, I know you're close.",
+				"Tch… slippery.",
+				"You won't get far.",
+				"Keep looking…",
+				"They were just here…",
+				"How did they vanish that fast?",
+				"Stay alert, they’re still around."
+			])
+
+			return false
+
+	return false
+
+# -----------------------------
+# BT: Investigate (noise / last known + search pattern)
+# -----------------------------
+func _bt_investigate(delta: float) -> bool:
+	if not investigating:
+		return false
+
+	_search_time += delta
+	if _search_time >= max_search_time:
+		_say_random([
+			"Guess it was nothing.",
+			"Hmm… must've been the wind.",
+			"Back to patrol, I guess.",
+			"False alarm…",
+			"Wasting my time.",
+			"Nothing here after all.",
+			"Thought I had something.",
+			"All clear… for now.",
+			"I'll let it slide… this time.",
+			"Back to the usual route."
+		])
+		_reset_to_patrol()
+		return false
+
+	if not _search_points.is_empty():
+		var close_enough := global_position.distance_to(agent.target_position) <= 4.0
+
+		if agent.is_navigation_finished() or close_enough:
+			_search_index += 1
+			if _search_index >= _search_points.size():
+				_say_random([
+					"Guess it was nothing.",
+					"Hmm… must've been the wind.",
+					"Back to patrol, I guess.",
+					"False alarm…",
+					"Wasting my time.",
+					"Nothing here after all.",
+					"Thought I had something.",
+					"All clear… for now.",
+					"I'll let it slide… this time.",
+					"Back to the usual route."
+				])
+				_search_points.clear()
+				_search_index = -1
+				_reset_to_patrol()
+				return false
+			else:
+				agent.target_position = _search_points[_search_index]
+		else:
+			_move_towards_smooth(agent.get_next_path_position(), delta, speed)
+
+		return true
+
+	var close_enough_simple := global_position.distance_to(agent.target_position) <= 4.0
+
+	if agent.is_navigation_finished() or close_enough_simple:
+		investigation_timer += delta
+		if investigation_timer >= investigation_wait_time:
+			print("Investigation done, back to patrol")
+
+			_say_random([
+				"Guess it was nothing.",
+				"Hmm… must've been the wind.",
+				"Back to patrol, I guess.",
+				"False alarm…",
+				"Wasting my time.",
+				"Nothing here after all.",
+				"Thought I had something.",
+				"All clear… for now.",
+				"I'll let it slide… this time.",
+				"Back to the usual route."
+			])
+
+			_reset_to_patrol()
+			return false
+	else:
+		_move_towards_smooth(agent.get_next_path_position(), delta, speed)
+
+	return true
+
+# -----------------------------
+# BT: Patrol between waypoints
+# -----------------------------
+func _bt_patrol(delta: float) -> void:
 	if waypoints.is_empty():
 		return
 
 	if waiting:
 		wait_timer -= delta
+
+		if look_around_enabled and wait_time > 0.1:
+			var t := 1.0 - maxf(wait_timer, 0.0) / maxf(wait_time, 0.0001)
+			var offset := sin(t * PI) * deg_to_rad(look_around_angle_deg)
+			facing_angle = _look_around_base_angle + offset
+
 		if wait_timer <= 0.0:
 			waiting = false
 			_next_waypoint()
 		return
 
-	if agent.is_navigation_finished():
+	var close_enough := global_position.distance_to(agent.target_position) <= 4.0
+
+	if agent.is_navigation_finished() or close_enough:
 		waiting = true
 		wait_timer = wait_time
+
+		if look_around_enabled and wait_time > 0.1:
+			_look_around_phase = 0.0
+			_look_around_base_angle = facing_angle
 	else:
 		_move_towards_smooth(agent.get_next_path_position(), delta, speed)
 
@@ -204,46 +682,12 @@ func _next_waypoint() -> void:
 	agent.target_position = waypoints[current_index]
 
 # -----------------------------
-# Investigation / Chase
-# -----------------------------
-func _process_investigation(delta: float) -> void:
-	# Chasing player live
-	if chasing_player and player:
-		if last_saw_player_timer >= chase_timeout:
-			print("Lost sight of player, go to last known position")
-			chasing_player = false
-			investigating = true
-			investigating_player = true
-			agent.target_position = last_player_pos
-			investigation_timer = 0.0
-			return
-
-		agent.target_position = player.global_position
-		_move_towards_smooth(agent.get_next_path_position(), delta, chase_speed)
-		return
-
-	# Investigating a static spot (noise / last known)
-	if agent.is_navigation_finished():
-		investigation_timer += delta
-		if investigation_timer >= investigation_wait_time:
-			investigating = false
-			investigating_player = false
-			chasing_player = false
-			investigation_timer = 0.0
-			last_saw_player_timer = 0.0
-			print("Investigation done, back to patrol")
-			if waypoints.size() > 0:
-				agent.target_position = waypoints[current_index]
-	else:
-		_move_towards_smooth(agent.get_next_path_position(), delta, speed)
-
-# -----------------------------
 # Latest-sound-wins helper
 # -----------------------------
 func _hear_noise_latest(pos: Vector2, is_player: bool) -> void:
 	var stamp := Time.get_ticks_msec()
 	if stamp <= _last_noise_stamp:
-		return  # ignore older (or same) reports
+		return
 	_last_noise_stamp = stamp
 
 	investigating = true
@@ -254,20 +698,53 @@ func _hear_noise_latest(pos: Vector2, is_player: bool) -> void:
 	last_saw_player_timer = 0.0
 	_hear_grace = hear_grace_time
 
+	_search_points.clear()
+	_search_index = -1
+	_search_time = 0.0
+
 	if is_player:
-		chasing_player = true
+		chasing_player = false
 		last_player_pos = pos
+
+		_suspicion = minf(
+			_suspicion + suspicion_min_to_investigate * 0.3,
+			suspicion_min_to_investigate * 0.9
+		)
+
+		_say_random([
+			"I heard that.",
+			"Those were footsteps…",
+			"You're not as quiet as you think.",
+			"Someone's there.",
+			"That came from over there.",
+			"You can't hide that sound.",
+			"I definitely heard something.",
+			"Those steps again…",
+			"There—move!",
+			"Keep making noise, see what happens."
+		])
 	else:
-		chasing_player = false  # rock overrides chase
+		chasing_player = false
+		_say_random([
+			"Huh? What was that?",
+			"Thought I heard something…",
+			"A noise? Better check it out.",
+			"That didn't sound right.",
+			"Something moved.",
+			"Was that the pipes…?",
+			"That came from over there.",
+			"Could be nothing… but I should check.",
+			"I don't like that sound.",
+			"Better not ignore that."
+		])
 
 	_update_heartbeat(chasing_player or (investigating and investigating_player))
 
-# Called by external sources:
 func hear_noise(pos: Vector2, is_player: bool = false) -> void:
 	_hear_noise_latest(pos, is_player)
 
 # -----------------------------
-# Noise handlers (probabilistic)
+# Noise handlers (probabilistic + LOS)
 # -----------------------------
 func _on_player_noise(pos: Vector2, radius: float, loudness: float, priority: int) -> void:
 	if _hear_cooldown > 0.0:
@@ -283,27 +760,25 @@ func _on_noise_emitted(pos: Vector2, radius: float, loudness: float, priority: i
 		_hear_noise_latest(pos, false)
 		_hear_cooldown = react_cooldown
 
-# Distance-aware probability. Farther = lower chance to react.
 func _should_react_to_noise(pos: Vector2, radius: float, loudness: float, priority: int) -> bool:
+	# No hearing through walls / blockers
+	if not _has_clear_sound_path(pos):
+		return false
+
 	var r: float = radius if radius > 0.0 else hear_radius_fallback
 	var d: float = global_position.distance_to(pos)
 	if d > r:
 		return false
 
-	# 0..1 proximity (1 near, 0 at edge) with quicker falloff
 	var proximity: float = clampf(1.0 - (d / r), 0.0, 1.0)
 	var proximity_boost: float = proximity * proximity
-
-	# Base probability blended by proximity
 	var base_prob: float = lerpf(prob_at_edge, prob_at_center, proximity_boost)
 
-	# Loudness/priority weighting
 	var pr: float = clampf(float(priority), 0.5, 3.0)
 	var weight: float = clampf(loudness, 0.0, 1.5) * (0.7 + 0.3 * pr)
 
 	var p: float = clampf(base_prob * weight, 0.0, 1.0)
 	return randf() < p
-
 
 # -----------------------------
 # Movement + Animation
@@ -312,14 +787,13 @@ func _move_towards_smooth(target_pos: Vector2, delta: float, current_speed: floa
 	var to_target: Vector2 = target_pos - global_position
 	var distance: float = to_target.length()
 
-	if distance < 0.1:
-		velocity = Vector2.ZERO
+	if distance < 0.001:
+		velocity = velocity.lerp(Vector2.ZERO, 5.0 * delta)
 		move_and_slide()
 		return
 
 	var target_angle: float = to_target.angle()
 
-	# Smooth turn towards target (normalize angle diff to [-PI, PI])
 	var angle_diff: float = target_angle - facing_angle
 	while angle_diff > PI:
 		angle_diff -= TAU
@@ -329,8 +803,18 @@ func _move_towards_smooth(target_pos: Vector2, delta: float, current_speed: floa
 	var turn_amount: float = signf(angle_diff) * minf(absf(angle_diff), turn_speed * delta)
 	facing_angle += turn_amount
 
-	# Only move if mostly facing the target
-	var facing_alignment: float = absf(angle_diff)
+	if distance < 0.1:
+		velocity = velocity.lerp(Vector2.ZERO, 5.0 * delta)
+		move_and_slide()
+		return
+
+	var new_diff: float = target_angle - facing_angle
+	while new_diff > PI:
+		new_diff -= TAU
+	while new_diff < -PI:
+		new_diff += TAU
+
+	var facing_alignment: float = absf(new_diff)
 	if facing_alignment < deg_to_rad(move_threshold):
 		var move_dir: Vector2 = Vector2.from_angle(facing_angle)
 		velocity = move_dir * current_speed
@@ -338,7 +822,6 @@ func _move_towards_smooth(target_pos: Vector2, delta: float, current_speed: floa
 		velocity = velocity.lerp(Vector2.ZERO, 5.0 * delta)
 
 	move_and_slide()
-
 
 func _angle_difference(from: float, to: float) -> float:
 	var diff := to - from

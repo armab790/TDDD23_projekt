@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://8a7be0n8dsi4"]
+
+[ext_resource type="Script" uid="uid://c0oli7tgmmsr7" path="res://scenes/DirectionArrow.gd" id="1_8b43l"]
+[ext_resource type="Texture2D" uid="uid://bqqpe0drmiaoh" path="res://assets/sprites/PNGs/arrowAndFoot.png" id="2_2lgdb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5tbtm"]
+atlas = ExtResource("2_2lgdb")
+region = Rect2(16, 16, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xah22"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5tbtm")
+}],
+"loop": true,
+"name": &"arrow",
+"speed": 5.0
+}]
+
+[node name="DirectionArrow" type="Node2D"]
+script = ExtResource("1_8b43l")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_xah22")
+animation = &"arrow"

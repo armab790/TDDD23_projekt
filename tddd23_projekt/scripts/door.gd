@@ -15,15 +15,21 @@ extends Area2D
 @onready var sfx_locked_player: AudioStreamPlayer2D = $sfx_locked
 @onready var sfx_open_player: AudioStreamPlayer2D = $sfx_open
 
+# Arrow hint scene (adjust path if needed)
+const HINT_ARROW_SCENE := preload("res://scenes/DirectionArrow.tscn")
+
 const LEVELS_DIR := "res://scenes/Levels/"
 const MAIN_MENU := "res://scenes/UI/MainMenu.tscn"
 const LEVEL_PREFIX := "Level"
 const LEVEL_EXT := ".tscn"
-@export var max_level: int = 7
+@export var max_level: int = 8
 
 var _player_in_range := false
 var _is_open := false
 var _open_sfx_played := false
+
+var _player_ref: Node2D = null
+
 
 func _ready() -> void:
 	add_to_group("doors")
@@ -38,13 +44,19 @@ func _ready() -> void:
 	if is_instance_valid(sfx_open_player) and sfx_open_player.stream == null and ResourceLoader.exists("res://audios/SFX/Open_Door.mp3"):
 		sfx_open_player.stream = load("res://audios/SFX/Open_Door.mp3")
 
+
 func _on_body_entered(body: Node) -> void:
 	if body.name == "Player":
 		_player_in_range = true
+		if body is Node2D:
+			_player_ref = body
+
 
 func _on_body_exited(body: Node) -> void:
 	if body.name == "Player":
 		_player_in_range = false
+		_player_ref = null
+
 
 func _process(_dt: float) -> void:
 	if _player_in_range and Input.is_action_just_pressed(action_name):
@@ -62,25 +74,28 @@ func _get_lever_root() -> Node:
 			return n
 	return get_tree().current_scene
 
+
 func _matching_levers() -> Array:
 	var all := get_tree().get_nodes_in_group("levers")
 	var root := _get_lever_root()
 	var out: Array = []
 	for l in all:
-		# filter by subtree (optional)
 		var in_scope := true
 		if root:
 			in_scope = root.is_ancestor_of(l)
-		# filter by channel (optional)
+
 		var channel_ok := true
 		if channel != "":
-			if l.has_method("get") and l.has_variable("channel"):
-				channel_ok = (l.channel == channel)
+			# Our lever script exports `channel`, so we can just read it
+			if l.has_method("get"):
+				channel_ok = str(l.get("channel")) == channel
 			else:
 				channel_ok = false
+
 		if in_scope and channel_ok:
 			out.append(l)
 	return out
+
 
 func _count_on_levers() -> int:
 	var cnt := 0
@@ -89,6 +104,7 @@ func _count_on_levers() -> int:
 			cnt += 1
 	return cnt
 
+
 func _auto_init_required_levers() -> void:
 	if required_levers >= 0:
 		return
@@ -96,6 +112,87 @@ func _auto_init_required_levers() -> void:
 	required_levers = total
 	if required_levers == 0:
 		await _open_door()
+
+# ---------- Lever hint helpers ----------
+
+# Approximate position of lever cluster, or null if none
+# Approximate position of lever cluster: prefer OFF levers
+func _get_levers_hint_position():
+	var levers := _matching_levers()
+	if levers.is_empty():
+		return null
+
+	# 1) Try to find the nearest OFF lever
+	var best_off: Node2D = null
+	var best_dist := INF
+
+	for l in levers:
+		if l is Node2D and not l.is_on:
+			var d := global_position.distance_to(l.global_position)
+			if d < best_dist:
+				best_dist = d
+				best_off = l
+
+	if best_off:
+		return best_off.global_position
+
+	# 2) Fallback: if all are ON (shouldn't really happen when door is locked),
+	#    return the nearest lever of any kind.
+	var best_any: Node2D = null
+	best_dist = INF
+	for l in levers:
+		if l is Node2D:
+			var d := global_position.distance_to(l.global_position)
+			if d < best_dist:
+				best_dist = d
+				best_any = l
+
+	if best_any:
+		return best_any.global_position
+
+	return null
+
+# Return progress for the set of levers that belong to THIS door
+# for the lever that was toggled.
+# Returns {} if this lever is not part of this door's group/scope/channel.
+func get_lever_progress_for_lever(lever: Node) -> Dictionary:
+	var levers := _matching_levers()
+	if levers.is_empty():
+		return {}
+
+	if not levers.has(lever):
+		return {}
+
+	var total := levers.size()
+	if total <= 0:
+		return {}
+
+	var on_count := 0
+	for l in levers:
+		if l.is_on:
+			on_count += 1
+
+	return {
+		"on": on_count,
+		"total": total,
+		"complete": on_count >= required_levers
+	}
+
+
+func _spawn_locked_hint_arrow() -> void:
+	if _player_ref == null or not is_instance_valid(_player_ref):
+		return
+	if HINT_ARROW_SCENE == null:
+		return
+
+	var hint_pos = _get_levers_hint_position()
+	if hint_pos == null:
+		return
+
+	var arrow := HINT_ARROW_SCENE.instantiate()
+	get_tree().current_scene.add_child(arrow)
+	arrow.setup(_player_ref, hint_pos)
+	
 
 # ---------- Try open / react to lever toggles ----------
 
@@ -108,6 +205,10 @@ func _try_open() -> void:
 		if is_instance_valid(sfx_locked_player) and sfx_locked_player.stream:
 			sfx_locked_player.play()
 		print("Door locked — levers ", on_count, "/", required_levers)
+
+		# Show hint arrow toward lever(s)
+		_spawn_locked_hint_arrow()
+
 
 func on_lever_toggled() -> void:
 	if _is_open:
@@ -135,7 +236,6 @@ func _open_door() -> void:
 	solid.set_deferred("collision_mask", 0)
 	print("Door opened!")
 
-# ----- Level advance helpers -----
 
 func _get_current_level_number() -> int:
 	var s := get_tree().current_scene
@@ -151,8 +251,10 @@ func _get_current_level_number() -> int:
 			return int(num_str)
 	return -1
 
+
 func _level_path(n: int) -> String:
 	return "%s%s%d%s" % [LEVELS_DIR, LEVEL_PREFIX, n, LEVEL_EXT]
+
 
 func _enter_next_level() -> void:
 	var target_path := next_scene

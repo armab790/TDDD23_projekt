@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://cr28653tc76ci"]
+
+[ext_resource type="Script" uid="uid://y86qoaaj27h1" path="res://scenes/FootstepMark.gd" id="1_nwgy4"]
+[ext_resource type="Texture2D" uid="uid://bqqpe0drmiaoh" path="res://assets/sprites/PNGs/arrowAndFoot.png" id="2_ruums"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x1cj7"]
+atlas = ExtResource("2_ruums")
+region = Rect2(32, 16, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8e3ia"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x1cj7")
+}],
+"loop": true,
+"name": &"Footsteps",
+"speed": 5.0
+}]
+
+[node name="FootstepMark" type="Node2D"]
+script = ExtResource("1_nwgy4")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_8e3ia")
+animation = &"Footsteps"
+speed_scale = 0.4

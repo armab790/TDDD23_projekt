@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://byyoyic6uyubu"]
+[gd_scene load_steps=9 format=3 uid="uid://byyoyic6uyubu"]
 
 [ext_resource type="Texture2D" uid="uid://djje420iyae1p" path="res://assets/sprites/PNGs/LeverOff.png" id="1_0vwrv"]
 [ext_resource type="Script" uid="uid://n458bh6s4rg8" path="res://scenes/lever.gd" id="1_cu1kr"]
@@ -38,6 +38,14 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_7u13s"]
 radius = 23.0217
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_hd7rw"]
+blend_mode = 1
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hd7rw"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
+
 [node name="Lever" type="Area2D"]
 script = ExtResource("1_cu1kr")
 
@@ -52,3 +60,35 @@ one_way_collision_margin = 74.8
 [node name="sfx_pull" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("4_hd7rw")
 volume_db = 2.0
+
+[node name="LeverProgressLabel" type="Label" parent="."]
+z_index = 10
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -7.0
+offset_top = -17.0
+offset_right = 23.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.5, 0.5)
+horizontal_alignment = 1
+
+[node name="UnlockParticles" type="GPUParticles2D" parent="."]
+modulate = Color(0.60128, 0.601102, 0, 1)
+z_index = 10
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_hd7rw")
+position = Vector2(-1, -31)
+scale = Vector2(0.8, 0.8)
+emitting = false
+amount = 200
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+randomness = 0.5
+local_coords = true
+trail_lifetime = 1.5
+process_material = SubResource("ParticleProcessMaterial_hd7rw")
