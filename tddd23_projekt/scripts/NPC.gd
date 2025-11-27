@@ -125,12 +125,9 @@ func refresh_alert_fx() -> void:
 func _find_player() -> void:
 	if player and is_instance_valid(player):
 		return
-
-	# Find first node in group "player" (works even if hierarchy changes)
 	var p := get_tree().get_first_node_in_group("player")
 	if p and p is CharacterBody2D:
 		player = p
-
 
 # -----------------------------
 # Heartbeat & pulse
@@ -180,6 +177,60 @@ func _has_clear_sound_path(pos: Vector2) -> bool:
 	return false
 
 # -----------------------------
+# Simple bark / speech helpers
+# -----------------------------
+func _say_line(text: String) -> void:
+	if _bark_cooldown_timer > 0.0:
+		return
+	_bark_cooldown_timer = bark_cooldown
+	_speech_timer = speech_visible_time
+	_last_bark_text = text
+
+	if speech_label:
+		speech_label.text = text
+	else:
+		print("[NPC]: ", text)
+
+func _say_random(lines: Array[String]) -> void:
+	if lines.is_empty():
+		return
+	if lines.size() == 1:
+		_say_line(lines[0])
+		return
+
+	var chosen: String = lines[randi() % lines.size()]
+	var attempts := 0
+	while chosen == _last_bark_text and attempts < 4:
+		chosen = lines[randi() % lines.size()]
+		attempts += 1
+
+	_say_line(chosen)
+
+# -----------------------------
+# LLM-integrerad bark helper (2 argument)
+# -----------------------------
+func _say_with_llm(context: String, fallback_lines: Array[String]) -> void:
+	# Respektera cooldown
+	if _bark_cooldown_timer > 0.0:
+		return
+
+	# Om LLMDialogue inte finns eller saknar metoden → fallback
+	if typeof(LLMDialogue) == TYPE_NIL or not LLMDialogue.has_method("request_guard_line"):
+		_say_random(fallback_lines)
+		return
+
+	# Anropa LLMDialogue med (context, callback)
+	var cb := Callable(self, "_apply_llm_line").bind(fallback_lines)
+	LLMDialogue.request_guard_line(context, cb)
+
+func _apply_llm_line(text: String, fallback_lines: Array[String]) -> void:
+	var final_text := String(text).strip_edges()
+	if final_text == "" or final_text == "...":
+		_say_random(fallback_lines)
+	else:
+		_say_line(final_text)
+
+# -----------------------------
 # Ready
 # -----------------------------
 func _ready() -> void:
@@ -202,25 +253,8 @@ func _ready() -> void:
 	if heartbeat.stream and heartbeat.stream.has_method("set_loop"):
 		heartbeat.stream.set_loop(true)
 
-	_init_waypoints()
-
-	# connect PLAYER noise to a dedicated handler
-	if player and player.has_signal("noise_emitted"):
-		player.connect("noise_emitted", Callable(self, "_on_player_noise"))
-
-	# Resolve speech label (either via path or by name)
-	if speech_label_path != NodePath():
-		speech_label = get_node_or_null(speech_label_path)
-	else:
-		speech_label = get_node_or_null("SpeechLabel")
-
-	if speech_label:
-		speech_label.text = ""
-		
-		_init_waypoints()
-
-	# Find player in a robust way
 	_find_player()
+	_init_waypoints()
 
 	# connect PLAYER noise to a dedicated handler
 	if player and player.has_signal("noise_emitted"):
@@ -235,7 +269,6 @@ func _ready() -> void:
 
 	if speech_label:
 		speech_label.text = ""
-
 
 	_patrol_bark_timer = patrol_bark_interval
 
@@ -286,36 +319,6 @@ func _reset_to_patrol() -> void:
 	refresh_alert_fx()
 
 # -----------------------------
-# Simple bark / speech helpers
-# -----------------------------
-func _say_line(text: String) -> void:
-	if _bark_cooldown_timer > 0.0:
-		return
-	_bark_cooldown_timer = bark_cooldown
-	_speech_timer = speech_visible_time
-	_last_bark_text = text
-
-	if speech_label:
-		speech_label.text = text
-	else:
-		print("[NPC]: ", text)
-
-func _say_random(lines: Array[String]) -> void:
-	if lines.is_empty():
-		return
-	if lines.size() == 1:
-		_say_line(lines[0])
-		return
-
-	var chosen: String = lines[randi() % lines.size()]
-	var attempts := 0
-	while chosen == _last_bark_text and attempts < 4:
-		chosen = lines[randi() % lines.size()]
-		attempts += 1
-
-	_say_line(chosen)
-
-# -----------------------------
 # Guard alert broadcast
 # -----------------------------
 func _broadcast_alert(pos: Vector2) -> void:
@@ -335,12 +338,15 @@ func on_alert_from_guard(pos: Vector2) -> void:
 	agent.target_position = pos
 	investigation_timer = 0.0
 
-	_say_random([
-		"What's going on over there?",
-		"He found something!",
-		"I'm on my way.",
-		"Trouble? Moving to assist."
-	])
+	_say_with_llm(
+		"another guard has spotted something suspicious and calls for help",
+		[
+			"What's going on over there?",
+			"He found something!",
+			"I'm on my way.",
+			"Trouble? Moving to assist."
+		]
+	)
 
 # -----------------------------
 # STUCK DETECTION
@@ -391,18 +397,21 @@ func _update_guard_smalltalk() -> void:
 
 		var dist := global_position.distance_to(e.global_position)
 		if dist <= guard_chat_distance:
-			_say_random([
-				"You see anything?",
-				"All quiet on your side?",
-				"Same patrol, different night.",
-				"Stay sharp, they could be anywhere.",
-				"I'm freezing. You?",
-				"If you see something, shout.",
-				"Don't fall asleep on me.",
-				"Switch with me later?",
-				"Nothing on this side.",
-				"Keep your eyes open."
-			])
+			_say_with_llm(
+				"two tired guards briefly pass each other on patrol and exchange a short remark",
+				[
+					"You see anything?",
+					"All quiet on your side?",
+					"Same patrol, different night.",
+					"Stay sharp, they could be anywhere.",
+					"I'm freezing. You?",
+					"If you see something, shout.",
+					"Don't fall asleep on me.",
+					"Switch with me later?",
+					"Nothing on this side.",
+					"Keep your eyes open."
+				]
+			)
 			_guard_chat_timer = guard_chat_cooldown
 			break
 
@@ -411,14 +420,13 @@ func _update_guard_smalltalk() -> void:
 # -----------------------------
 func _physics_process(delta: float) -> void:
 	_find_player()
-	
+
 	_hear_cooldown = maxf(0.0, _hear_cooldown - delta)
 	_hear_grace = maxf(0.0, _hear_grace - delta)
 	_bark_cooldown_timer = maxf(0.0, _bark_cooldown_timer - delta)
 	_patrol_bark_timer = maxf(0.0, _patrol_bark_timer - delta)
 	_guard_chat_timer = maxf(0.0, _guard_chat_timer - delta)
 
-	# suspicion decays over time (now mostly flavour)
 	_suspicion = maxf(0.0, _suspicion - suspicion_decay_rate * delta)
 
 	if _speech_timer > 0.0:
@@ -431,20 +439,23 @@ func _physics_process(delta: float) -> void:
 
 	# Patrol muttering
 	if not chasing_player and not investigating and _patrol_bark_timer <= 0.0:
-		_say_random([
-			"Hmm… quiet.",
-			"Another boring patrol.",
-			"…Did I hear something?",
-			"Stay sharp.",
-			"Same route, same shadows.",
-			"Nothing ever happens down here.",
-			"If they catch me slacking, I'm done.",
-			"I hate this shift.",
-			"Feels like someone's watching me.",
-			"Why is it always so cold here?",
-			"Focus… just keep moving.",
-			"One more round and I'm done."
-		])
+		_say_with_llm(
+			"a guard is walking alone on patrol in an underground facility, thinking quietly to themselves",
+			[
+				"Hmm… quiet.",
+				"Another boring patrol.",
+				"…Did I hear something?",
+				"Stay sharp.",
+				"Same route, same shadows.",
+				"Nothing ever happens down here.",
+				"If they catch me slacking, I'm done.",
+				"I hate this shift.",
+				"Feels like someone's watching me.",
+				"Why is it always so cold here?",
+				"Focus… just keep moving.",
+				"One more round and I'm done."
+			]
+		)
 		_patrol_bark_timer = patrol_bark_interval + randf_range(-4.0, 4.0)
 
 	if not chasing_player and not investigating:
@@ -465,10 +476,9 @@ func _run_behavior_tree(delta: float) -> void:
 	_bt_patrol(delta)
 
 # -----------------------------
-# BT: Chase (simplified, reliable)
+# BT: Chase
 # -----------------------------
 func _bt_chase(delta: float) -> bool:
-	# Make sure we have a valid player reference
 	_find_player()
 	if not player or not is_instance_valid(player):
 		chasing_player = false
@@ -478,13 +488,11 @@ func _bt_chase(delta: float) -> bool:
 	var dist_to_player: float = global_position.distance_to(player.global_position)
 	var dist_ok := dist_to_player <= catch_distance
 
-	# If we have line of sight to the player → full chase
 	if can_see:
 		last_player_pos = player.global_position
 		last_saw_player_timer = 0.0
-		_suspicion = suspicion_threshold  # treat as fully alerted when seen
+		_suspicion = suspicion_threshold
 
-		# Enter chase state if not already
 		if not chasing_player:
 			chasing_player = true
 			investigating = false
@@ -493,31 +501,30 @@ func _bt_chase(delta: float) -> bool:
 
 			_broadcast_alert(player.global_position)
 
-			_say_random([
-				"There you are!",
-				"I see you!",
-				"Got you now!",
-				"Hey! Stop right there!",
-				"You really thought you could sneak past me?",
-				"Got eyes on the target!",
-				"Found you!",
-				"You shouldn't be here!",
-				"There! Over there!",
-				"I knew it!"
-			])
+			_say_with_llm(
+				"a guard suddenly spots an intruder and starts chasing them",
+				[
+					"There you are!",
+					"I see you!",
+					"Got you now!",
+					"Hey! Stop right there!",
+					"You really thought you could sneak past me?",
+					"Got eyes on the target!",
+					"Found you!",
+					"You shouldn't be here!",
+					"There! Over there!",
+					"I knew it!"
+				]
+			)
 
-		# If close enough, catch immediately
 		if dist_ok and _hear_grace <= 0.0:
 			Transition.caught_and_restart()
 			return true
 
-		# Otherwise, move directly toward the player
 		agent.target_position = player.global_position
 		_move_towards_smooth(agent.get_next_path_position(), delta, chase_speed)
 		return true
 
-	# If we *don’t* currently see the player but were chasing,
-	# move toward last known position for a while
 	if chasing_player:
 		last_saw_player_timer += delta
 
@@ -526,7 +533,6 @@ func _bt_chase(delta: float) -> bool:
 			_move_towards_smooth(agent.get_next_path_position(), delta, chase_speed)
 			return true
 		else:
-			# Timed out: switch into search around last known position
 			print("Lost sight of player, starting search around last known position")
 			chasing_player = false
 			last_saw_player_timer = 0.0
@@ -548,25 +554,28 @@ func _bt_chase(delta: float) -> bool:
 
 			agent.target_position = last_player_pos
 
-			_say_random([
-				"Where did you go?",
-				"You can't hide forever.",
-				"I know you're here somewhere…",
-				"Come out, I know you're close.",
-				"Tch… slippery.",
-				"You won't get far.",
-				"Keep looking…",
-				"They were just here…",
-				"How did they vanish that fast?",
-				"Stay alert, they’re still around."
-			])
+			_say_with_llm(
+				"a guard lost sight of the intruder and is frustrated, searching the area",
+				[
+					"Where did you go?",
+					"You can't hide forever.",
+					"I know you're here somewhere…",
+					"Come out, I know you're close.",
+					"Tch… slippery.",
+					"You won't get far.",
+					"Keep looking…",
+					"They were just here…",
+					"How did they vanish that fast?",
+					"Stay alert, they’re still around."
+				]
+			)
 
 			return false
 
 	return false
 
 # -----------------------------
-# BT: Investigate (noise / last known + search pattern)
+# BT: Investigate
 # -----------------------------
 func _bt_investigate(delta: float) -> bool:
 	if not investigating:
@@ -574,18 +583,21 @@ func _bt_investigate(delta: float) -> bool:
 
 	_search_time += delta
 	if _search_time >= max_search_time:
-		_say_random([
-			"Guess it was nothing.",
-			"Hmm… must've been the wind.",
-			"Back to patrol, I guess.",
-			"False alarm…",
-			"Wasting my time.",
-			"Nothing here after all.",
-			"Thought I had something.",
-			"All clear… for now.",
-			"I'll let it slide… this time.",
-			"Back to the usual route."
-		])
+		_say_with_llm(
+			"a guard gives up searching after not finding anything suspicious",
+			[
+				"Guess it was nothing.",
+				"Hmm… must've been the wind.",
+				"Back to patrol, I guess.",
+				"False alarm…",
+				"Wasting my time.",
+				"Nothing here after all.",
+				"Thought I had something.",
+				"All clear… for now.",
+				"I'll let it slide… this time.",
+				"Back to the usual route."
+			]
+		)
 		_reset_to_patrol()
 		return false
 
@@ -595,18 +607,21 @@ func _bt_investigate(delta: float) -> bool:
 		if agent.is_navigation_finished() or close_enough:
 			_search_index += 1
 			if _search_index >= _search_points.size():
-				_say_random([
-					"Guess it was nothing.",
-					"Hmm… must've been the wind.",
-					"Back to patrol, I guess.",
-					"False alarm…",
-					"Wasting my time.",
-					"Nothing here after all.",
-					"Thought I had something.",
-					"All clear… for now.",
-					"I'll let it slide… this time.",
-					"Back to the usual route."
-				])
+				_say_with_llm(
+					"a guard stops searching after checking a few spots and finding nothing",
+					[
+						"Guess it was nothing.",
+						"Hmm… must've been the wind.",
+						"Back to patrol, I guess.",
+						"False alarm…",
+						"Wasting my time.",
+						"Nothing here after all.",
+						"Thought I had something.",
+						"All clear… for now.",
+						"I'll let it slide… this time.",
+						"Back to the usual route."
+					]
+				)
 				_search_points.clear()
 				_search_index = -1
 				_reset_to_patrol()
@@ -625,18 +640,21 @@ func _bt_investigate(delta: float) -> bool:
 		if investigation_timer >= investigation_wait_time:
 			print("Investigation done, back to patrol")
 
-			_say_random([
-				"Guess it was nothing.",
-				"Hmm… must've been the wind.",
-				"Back to patrol, I guess.",
-				"False alarm…",
-				"Wasting my time.",
-				"Nothing here after all.",
-				"Thought I had something.",
-				"All clear… for now.",
-				"I'll let it slide… this time.",
-				"Back to the usual route."
-			])
+			_say_with_llm(
+				"a guard waits a moment at the suspicious spot, then decides it was nothing",
+				[
+					"Guess it was nothing.",
+					"Hmm… must've been the wind.",
+					"Back to patrol, I guess.",
+					"False alarm…",
+					"Wasting my time.",
+					"Nothing here after all.",
+					"Thought I had something.",
+					"All clear… for now.",
+					"I'll let it slide… this time.",
+					"Back to the usual route."
+				]
+			)
 
 			_reset_to_patrol()
 			return false
@@ -648,12 +666,12 @@ func _bt_investigate(delta: float) -> bool:
 # -----------------------------
 # BT: Patrol between waypoints
 # -----------------------------
-func _bt_patrol(delta: float) -> void:
+func _bt_patrol(_delta: float) -> void:
 	if waypoints.is_empty():
 		return
 
 	if waiting:
-		wait_timer -= delta
+		wait_timer -= _delta
 
 		if look_around_enabled and wait_time > 0.1:
 			var t := 1.0 - maxf(wait_timer, 0.0) / maxf(wait_time, 0.0001)
@@ -675,7 +693,7 @@ func _bt_patrol(delta: float) -> void:
 			_look_around_phase = 0.0
 			_look_around_base_angle = facing_angle
 	else:
-		_move_towards_smooth(agent.get_next_path_position(), delta, speed)
+		_move_towards_smooth(agent.get_next_path_position(), _delta, speed)
 
 func _next_waypoint() -> void:
 	current_index = (current_index + 1) % waypoints.size()
@@ -711,32 +729,38 @@ func _hear_noise_latest(pos: Vector2, is_player: bool) -> void:
 			suspicion_min_to_investigate * 0.9
 		)
 
-		_say_random([
-			"I heard that.",
-			"Those were footsteps…",
-			"You're not as quiet as you think.",
-			"Someone's there.",
-			"That came from over there.",
-			"You can't hide that sound.",
-			"I definitely heard something.",
-			"Those steps again…",
-			"There—move!",
-			"Keep making noise, see what happens."
-		])
+		_say_with_llm(
+			"a guard hears clear human footsteps nearby in the dark",
+			[
+				"I heard that.",
+				"Those were footsteps…",
+				"You're not as quiet as you think.",
+				"Someone's there.",
+				"That came from over there.",
+				"You can't hide that sound.",
+				"I definitely heard something.",
+				"Those steps again…",
+				"There—move!",
+				"Keep making noise, see what happens."
+			]
+		)
 	else:
 		chasing_player = false
-		_say_random([
-			"Huh? What was that?",
-			"Thought I heard something…",
-			"A noise? Better check it out.",
-			"That didn't sound right.",
-			"Something moved.",
-			"Was that the pipes…?",
-			"That came from over there.",
-			"Could be nothing… but I should check.",
-			"I don't like that sound.",
-			"Better not ignore that."
-		])
+		_say_with_llm(
+			"a guard hears a vague non-human noise, like a rock or the pipes, and decides to check it",
+			[
+				"Huh? What was that?",
+				"Thought I heard something…",
+				"A noise? Better check it out.",
+				"That didn't sound right.",
+				"Something moved.",
+				"Was that the pipes…?",
+				"That came from over there.",
+				"Could be nothing… but I should check.",
+				"I don't like that sound.",
+				"Better not ignore that."
+			]
+		)
 
 	_update_heartbeat(chasing_player or (investigating and investigating_player))
 
@@ -761,7 +785,6 @@ func _on_noise_emitted(pos: Vector2, radius: float, loudness: float, priority: i
 		_hear_cooldown = react_cooldown
 
 func _should_react_to_noise(pos: Vector2, radius: float, loudness: float, priority: int) -> bool:
-	# No hearing through walls / blockers
 	if not _has_clear_sound_path(pos):
 		return false
 

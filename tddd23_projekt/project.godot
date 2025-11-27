@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 Transition="*res://scenes/Transition.tscn"
 MusicPlayer="*res://singletons/MusicPlayer.tscn"
 PauseMenu="*res://scenes/UI/PauseMenu.tscn"
+LLMDialogue="*res://scripts/LLMDialogue.gd"
 
 [display]
 
