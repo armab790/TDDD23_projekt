@@ -2,7 +2,7 @@ extends Node
 
 const OLLAMA_URL := "http://127.0.0.1:11434/api/generate"
 
-@export var model_name: String = "mistral"   # samma som du kör i Ollama
+@export var model_name: String = "mistral"   # samma som körs i Ollama
 @export var timeout_seconds: float = 8.0     # enkel timeout-säkerhet
 
 var _http: HTTPRequest

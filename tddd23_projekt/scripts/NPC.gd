@@ -45,6 +45,14 @@ var _patrol_bark_timer: float = 0.0
 var _speech_timer: float = 0.0
 @onready var speech_label: Label = get_node_or_null(speech_label_path)
 
+
+# BT
+const BTNode = preload("res://scripts/bt_nodes.gd")
+const BTStatus = BTNode.Status
+
+var _bt_root  # roten till trädet
+
+
 # Remember last line to avoid immediate repeats
 var _last_bark_text: String = ""
 
@@ -271,6 +279,24 @@ func _ready() -> void:
 		speech_label.text = ""
 
 	_patrol_bark_timer = patrol_bark_interval
+	
+	var chase_sequence = BTNode.Sequence.new([
+		BTNode.Condition.new(Callable(self, "_bt_can_chase")),
+		BTNode.Action.new(Callable(self, "_bt_do_chase"))
+	])
+
+	var investigate_sequence = BTNode.Sequence.new([
+		BTNode.Condition.new(Callable(self, "_bt_should_investigate")),
+		BTNode.Action.new(Callable(self, "_bt_do_investigate"))
+	])
+
+	var patrol_action = BTNode.Action.new(Callable(self, "_bt_do_patrol"))
+
+	_bt_root = BTNode.Selector.new([
+		chase_sequence,
+		investigate_sequence,
+		patrol_action
+	])
 
 # -----------------------------
 # Waypoint init (robust)
@@ -434,7 +460,9 @@ func _physics_process(delta: float) -> void:
 		if _speech_timer <= 0.0 and speech_label:
 			speech_label.text = ""
 
-	_run_behavior_tree(delta)
+	if _bt_root != null:
+		_bt_root.tick(delta, self)
+
 	_update_stuck(delta)
 
 	# Patrol muttering
@@ -464,6 +492,46 @@ func _physics_process(delta: float) -> void:
 	var pursuing := chasing_player or (investigating and investigating_player)
 	_update_heartbeat(pursuing)
 	_update_animation()
+	
+	
+# =============================
+# BT condition & action wrappers
+# =============================
+
+# Called by BTNode.Condition: should we *try* to run chase branch?
+func _bt_can_chase(_owner: Node) -> bool:
+	_find_player()
+	if not player or not is_instance_valid(player):
+		return false
+
+	# We want chase branch active if we already chase OR can see player now
+	return _can_see_player(player) or chasing_player
+
+
+# Called by BTNode.Action: actually run chase logic for this tick
+func _bt_do_chase(delta: float, _owner: Node) -> int:
+	var handled: bool = _bt_chase(delta)
+	# While chase is ongoing, report RUNNING. If chase logic says "no work",
+	# we let selector try next branch.
+	return BTStatus.RUNNING if handled else BTStatus.FAILURE
+
+
+# Called by BTNode.Condition: should we run investigate branch?
+func _bt_should_investigate(_owner: Node) -> bool:
+	return investigating
+
+
+# Called by BTNode.Action: run investigate logic for this tick
+func _bt_do_investigate(delta: float, _owner: Node) -> int:
+	var handled: bool = _bt_investigate(delta)
+	return BTStatus.RUNNING if handled else BTStatus.FAILURE
+
+
+# Called by BTNode.Action: default fallback = patrol
+func _bt_do_patrol(delta: float, _owner: Node) -> int:
+	_bt_patrol(delta)
+	return BTStatus.RUNNING
+
 
 # -----------------------------
 # Root: Chase -> Investigate -> Patrol
